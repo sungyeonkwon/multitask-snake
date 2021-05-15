@@ -44,8 +44,8 @@ export class Snake {
 }
 
 export class Board {
-  bounds: Coords;
   snakes?: Snake[];
+  bounds: Coords;
   selectedSnake = 0;
   food: Coords[] = [];
   private _snakeCount?: number;
@@ -66,7 +66,11 @@ export class Board {
     return this._snakeCount;
   }
 
-  areSnakesSafeToProceed() {
+  setSnakeCount(count: number) {
+    this._snakeCount = count;
+  }
+
+  canProceed() {
     for (let i = 0; i < this.snakes.length; i++) {
       const snake = this.snakes[i];
       const hasWallHit = this.bumpToWall(snake.newHead);
@@ -75,24 +79,8 @@ export class Board {
     return true;
   }
 
-  setSnakeCount(count: number) {
-    this._snakeCount = count;
-  }
-
-  setSnakes(snakes: Snake[]) {
-    this.snakes = snakes;
-  }
-
-  setFood(food: Coords[]) {
-    this.food = food;
-  }
-
-  addFood() {
-    this.food.push(getRandomCoords(this.bounds));
-  }
-
   // TODO
-  bumpToSelf(newHead: Coords, snake: Snake): boolean {
+  bumpToSnake(newHead: Coords, snake: Snake): boolean {
     return false;
     // return snake.sequence.some(
     //     segment => segment.x === newHead.x && segment.y === newHead.y);
@@ -102,10 +90,6 @@ export class Board {
     return (
         newHead.x < 0 || newHead.y < 0 || newHead.x >= this.bounds.x ||
         newHead.y >= this.bounds.y);
-  }
-
-  endGame() {
-    console.log('dead!');
   }
 
   tick(): boolean {
@@ -119,7 +103,7 @@ export class Board {
       if (foodIndex >= 0) {
         snake.grow();
         this.food.splice(foodIndex, 1);
-        this.addFood();
+        this.food.push(getRandomCoords(this.bounds));
         return true;
       }
     }
@@ -158,12 +142,13 @@ export class Page {
       food.push(newFood);
     }
 
-    this.board.setSnakes(snakes);
-    this.board.setFood(food);
+    this.board.snakes = snakes;
+    this.board.food = food;
 
     this.render();
   }
 
+  // Add throttle
   onKeyDown = (event: KeyboardEvent) => {
     const direction = directionKeyMap.get(event.code);
     if (direction) {
@@ -175,21 +160,17 @@ export class Page {
     if (index) this.board.selectedSnake = index - 1;
   };
 
-  gameOver() {
+  stopGame() {
     cancelAnimationFrame(this.intervalId.value);
     this.dialog.classList.remove('hide');
     this.gameOverContainer.classList.add('show');
   }
 
-  showEatenCount() {
-    console.log('showEatenCount');
-    this.foodInfo.innerText = this.eatCount.toString();
-  }
-
   render = () => {
     this.intervalId = requestInterval(() => {
-      if (!this.board.areSnakesSafeToProceed()) {
-        this.gameOver();
+      if (!this.board.canProceed()) {
+        this.stopGame();
+        this.gameOverContainer.classList.add('show');
         return;
       }
 
@@ -201,22 +182,24 @@ export class Page {
 
       if (hasEaten) {
         this.eatCount++;
-        this.showEatenCount();
+        this.foodInfo.innerText = this.eatCount.toString();
       }
 
       this.board.snakes.forEach((snake, snakeIndex) => {
         this.drawSnake(snake, snakeIndex);
       });
-    }, 360);
+    }, 1000);
   };
 
+  // to make it smooth, it just needs to be granular and not fixed by block.
   drawSnake(snake: Snake, snakeIndex: number) {
     const {x, y} = snake.head;
     const PADDING = 2;
     const isSnakeSelected = snakeIndex === this.board.selectedSnake;
 
     // Fill body
-    this.ctx.fillStyle = Color.SNAKE_BODY;
+    this.ctx.fillStyle =
+        isSnakeSelected ? Color.SNAKE_BODY_SELECTED : Color.SNAKE_BODY;
     snake.sequence.forEach((coords) => {
       this.ctx.fillRect(
           coords.x * (BLOCK_SIZE + 1) + 1, coords.y * (BLOCK_SIZE + 1) + 1,
@@ -231,9 +214,9 @@ export class Page {
         BLOCK_SIZE);
 
     // Fill number
-    this.ctx.fillStyle = isSnakeSelected ? Color.SNAKE_HEAD_SELECTED_TEXT :
+    this.ctx.fillStyle = isSnakeSelected ? Color.SNAKE_HEAD_TEXT_SELECTED :
                                            Color.SNAKE_HEAD_TEXT;
-    this.ctx.font = '22px sans-serif';
+    this.ctx.font = '22px "IBM Plex Mono"';
     this.ctx.fillText(
         (snakeIndex + 1).toString(), x * (BLOCK_SIZE + 1) + 1 + PADDING,
         (y + 1) * (BLOCK_SIZE + 1) + 1 - PADDING);
@@ -253,14 +236,14 @@ export class Page {
     this.ctx.beginPath();
     this.ctx.strokeStyle = Color.GRID;
 
-    // Vertical lines.
+    // Vertical lines
     for (let i = 0; i <= this.board.width; i++) {
       this.ctx.moveTo(i * (BLOCK_SIZE + 1) + 1, 0);
       this.ctx.lineTo(
           i * (BLOCK_SIZE + 1) + 1, (BLOCK_SIZE + 1) * this.board.height + 1);
     }
 
-    // Horizontal lines.
+    // Horizontal lines
     for (let j = 0; j <= this.board.height; j++) {
       this.ctx.moveTo(0, j * (BLOCK_SIZE + 1) + 1);
       this.ctx.lineTo(

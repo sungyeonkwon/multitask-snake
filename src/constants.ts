@@ -5,11 +5,12 @@ export const INIT_SNAKE_SIZE = 5;
 
 export enum Color {
   GRID = 'lightgrey',
-  SNAKE_BODY = 'red',
+  SNAKE_BODY = 'pink',
+  SNAKE_BODY_SELECTED = 'red',
   SNAKE_HEAD = 'white',
-  SNAKE_HEAD_TEXT = 'black',
   SNAKE_HEAD_SELECTED = 'black',
-  SNAKE_HEAD_SELECTED_TEXT = 'white',
+  SNAKE_HEAD_TEXT = 'black',
+  SNAKE_HEAD_TEXT_SELECTED = 'white',
   FOOD = 'blue',
 }
 
@@ -25,14 +26,12 @@ export interface Coords {
   y: number;
 }
 
-// Change it to enum
 export const directionKeyMap = new Map<string, Direction>()
 directionKeyMap.set('ArrowLeft', Direction.LEFT);
 directionKeyMap.set('ArrowUp', Direction.UP);
 directionKeyMap.set('ArrowRight', Direction.RIGHT);
 directionKeyMap.set('ArrowDown', Direction.DOWN);
 
-// Change it to enum
 export const selectedSnakeKeyMap = new Map<string, number>()
 selectedSnakeKeyMap.set('Digit1', 1);
 selectedSnakeKeyMap.set('Digit2', 2);
