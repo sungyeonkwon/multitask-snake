@@ -1,30 +1,45 @@
 import '../dist/styles.scss';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH} from './constants';
+import {Dialog} from './dialog';
 import {Page} from './game';
 
-// Init canvas
-const canvas = document.querySelector('canvas');
-canvas.height = (BLOCK_SIZE + 1) * BOARD_HEIGHT + 1;
-canvas.width = (BLOCK_SIZE + 1) * BOARD_WIDTH + 1;
-const page = new Page(canvas);
+class Index {
+  canvas = document.querySelector('canvas');
+  page = new Page(this.canvas);
+  dialog = new Dialog();
 
-// Init dialog
-const dialog = document.querySelector('.dialog');
-const countButtons = dialog.querySelectorAll('button');
-const restartButton = document.querySelector('button.restart');
+  // don't need to be a class variable
+  countButtons: HTMLButtonElement[] =
+      Array.from(this.dialog.dialogElement.querySelectorAll('button'));
+  restartButton = document.querySelector('button.restart');
 
-// snake count listener
-Array.from(countButtons).forEach((button, index) => {
-  button.addEventListener('click', () => {
-    page.init(index + 1);
-    dialog.classList.add('hide');
-  });
-});
+  constructor() {
+    this.initCanvas();
+    this.addListeners();
+  }
 
-restartButton.addEventListener('click', () => {
-  page.stopGame();
-  dialog.classList.remove('hide');
-});
+  initCanvas() {
+    this.canvas.height = (BLOCK_SIZE + 1) * BOARD_HEIGHT + 1;
+    this.canvas.width = (BLOCK_SIZE + 1) * BOARD_WIDTH + 1;
+  }
 
-window.addEventListener('keydown', (event) => page.onKeyDown(event));
+  addListeners() {
+    // snake count listener
+    this.countButtons.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        this.page.init(index + 1);
+        this.dialog.dialogElement.classList.add('hide');
+      });
+    });
+
+    this.restartButton.addEventListener('click', () => {
+      this.page.stopGame();
+      this.dialog.dialogElement.classList.remove('hide');
+    });
+
+    window.addEventListener('keydown', (event) => this.page.onKeyDown(event));
+  }
+}
+
+new Index();

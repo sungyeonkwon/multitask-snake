@@ -3,6 +3,17 @@ export const BOARD_HEIGHT = 30;
 export const BLOCK_SIZE = 20;
 export const INIT_SNAKE_SIZE = 5;
 
+export const SNAKES = [
+  {type: 'Viper', pattern: ['yellow', 'black']},
+  {type: 'Green', pattern: ['green']},
+  {type: 'Boa', pattern: ['red', 'blue', 'red']},
+  {type: 'Viper', pattern: ['yellow', 'black']},
+  {type: 'Green', pattern: ['green']},
+  {type: 'Boa', pattern: ['red', 'blue', 'red']},
+];
+
+export const MAX_SNAKES_COUNT = 5;
+
 export enum Color {
   GRID = 'lightgrey',
   SNAKE_BODY = 'pink',
@@ -26,13 +37,13 @@ export interface Coords {
   y: number;
 }
 
-export const directionKeyMap = new Map<string, Direction>()
+export const directionKeyMap = new Map<string, Direction>();
 directionKeyMap.set('ArrowLeft', Direction.LEFT);
 directionKeyMap.set('ArrowUp', Direction.UP);
 directionKeyMap.set('ArrowRight', Direction.RIGHT);
 directionKeyMap.set('ArrowDown', Direction.DOWN);
 
-export const selectedSnakeKeyMap = new Map<string, number>()
+export const selectedSnakeKeyMap = new Map<string, number>();
 selectedSnakeKeyMap.set('Digit1', 1);
 selectedSnakeKeyMap.set('Digit2', 2);
 selectedSnakeKeyMap.set('Digit3', 3);

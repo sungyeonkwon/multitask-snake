@@ -2,6 +2,12 @@ import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, directionKeyMap, selectedS
 import {Coords, Direction, INIT_SNAKE_SIZE} from './constants';
 import {getNextCoords, getRandomCoords, getStartingCoords, isDirectionOpposite, requestInterval} from './helpers';
 
+enum Progress {
+  START = 1,
+  PAUSE,
+  RESET,
+}
+
 export class Snake {
   sequence: Coords[] = [];
   direction = Direction.RIGHT;
@@ -11,8 +17,7 @@ export class Snake {
     this.sequence.push(start);
 
     while (count > 0) {
-      const next = getNextCoords(
-          this.sequence[this.sequence.length - 1], Direction.LEFT);
+      const next = getNextCoords(this.sequence[this.sequence.length - 1], Direction.LEFT);
       this.sequence.push(next);
       count--;
     }
@@ -32,8 +37,7 @@ export class Snake {
   }
 
   grow() {
-    const next =
-        getNextCoords(this.sequence[this.sequence.length - 1], this.direction);
+    const next = getNextCoords(this.sequence[this.sequence.length - 1], this.direction);
     this.sequence.push(next);
   }
 
@@ -87,9 +91,7 @@ export class Board {
   }
 
   bumpToWall(newHead: Coords): boolean {
-    return (
-        newHead.x < 0 || newHead.y < 0 || newHead.x >= this.bounds.x ||
-        newHead.y >= this.bounds.y);
+    return newHead.x < 0 || newHead.y < 0 || newHead.x >= this.bounds.x || newHead.y >= this.bounds.y;
   }
 
   tick(): boolean {
@@ -97,8 +99,7 @@ export class Board {
       const snake = this.snakes[i];
       snake.step();
 
-      const foodIndex = this.food.findIndex(
-          (item) => item.x === snake.newHead.x && item.y === snake.newHead.y);
+      const foodIndex = this.food.findIndex((item) => item.x === snake.newHead.x && item.y === snake.newHead.y);
 
       if (foodIndex >= 0) {
         snake.grow();
@@ -112,7 +113,7 @@ export class Board {
 }
 
 export class Page {
-  intervalId: any;  // fix
+  intervalId: any; // fix
   board: Board;
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -134,7 +135,7 @@ export class Page {
 
     // populate snakes
     const snakes: Snake[] = [];
-    let food: Coords[] = [];
+    const food: Coords[] = [];
     for (let i = 0; i < this.board.snakeCount; i++) {
       const coords = getStartingCoords(this.board.snakeCount, i);
       snakes.push(new Snake(coords));
@@ -152,8 +153,7 @@ export class Page {
   onKeyDown = (event: KeyboardEvent) => {
     const direction = directionKeyMap.get(event.code);
     if (direction) {
-      const snake = this.board.snakes.find(
-          (_, index) => index === this.board.selectedSnake);
+      const snake = this.board.snakes.find((_, index) => index === this.board.selectedSnake);
       snake.setDirection(direction);
     }
     const index = selectedSnakeKeyMap.get(event.code);
@@ -198,37 +198,30 @@ export class Page {
     const isSnakeSelected = snakeIndex === this.board.selectedSnake;
 
     // Fill body
-    this.ctx.fillStyle =
-        isSnakeSelected ? Color.SNAKE_BODY_SELECTED : Color.SNAKE_BODY;
+    this.ctx.fillStyle = isSnakeSelected ? Color.SNAKE_BODY_SELECTED : Color.SNAKE_BODY;
     snake.sequence.forEach((coords) => {
-      this.ctx.fillRect(
-          coords.x * (BLOCK_SIZE + 1) + 1, coords.y * (BLOCK_SIZE + 1) + 1,
-          BLOCK_SIZE, BLOCK_SIZE);
+      this.ctx.fillRect(coords.x * (BLOCK_SIZE + 1) + 1, coords.y * (BLOCK_SIZE + 1) + 1, BLOCK_SIZE, BLOCK_SIZE);
     });
 
     // Fill head
-    this.ctx.fillStyle =
-        isSnakeSelected ? Color.SNAKE_HEAD_SELECTED : Color.SNAKE_HEAD;
-    this.ctx.fillRect(
-        x * (BLOCK_SIZE + 1) + 1, y * (BLOCK_SIZE + 1) + 1, BLOCK_SIZE,
-        BLOCK_SIZE);
+    this.ctx.fillStyle = isSnakeSelected ? Color.SNAKE_HEAD_SELECTED : Color.SNAKE_HEAD;
+    this.ctx.fillRect(x * (BLOCK_SIZE + 1) + 1, y * (BLOCK_SIZE + 1) + 1, BLOCK_SIZE, BLOCK_SIZE);
 
     // Fill number
-    this.ctx.fillStyle = isSnakeSelected ? Color.SNAKE_HEAD_TEXT_SELECTED :
-                                           Color.SNAKE_HEAD_TEXT;
+    this.ctx.fillStyle = isSnakeSelected ? Color.SNAKE_HEAD_TEXT_SELECTED : Color.SNAKE_HEAD_TEXT;
     this.ctx.font = '22px "IBM Plex Mono"';
     this.ctx.fillText(
-        (snakeIndex + 1).toString(), x * (BLOCK_SIZE + 1) + 1 + PADDING,
-        (y + 1) * (BLOCK_SIZE + 1) + 1 - PADDING);
-  };
+      (snakeIndex + 1).toString(),
+      x * (BLOCK_SIZE + 1) + 1 + PADDING,
+      (y + 1) * (BLOCK_SIZE + 1) + 1 - PADDING,
+    );
+  }
 
   drawFood() {
     this.ctx.beginPath();
     this.ctx.fillStyle = Color.FOOD;
     this.board.food.forEach((item) => {
-      this.ctx.fillRect(
-          item.x * (BLOCK_SIZE + 1) + 1, item.y * (BLOCK_SIZE + 1) + 1,
-          BLOCK_SIZE, BLOCK_SIZE);
+      this.ctx.fillRect(item.x * (BLOCK_SIZE + 1) + 1, item.y * (BLOCK_SIZE + 1) + 1, BLOCK_SIZE, BLOCK_SIZE);
     });
   }
 
@@ -239,17 +232,15 @@ export class Page {
     // Vertical lines
     for (let i = 0; i <= this.board.width; i++) {
       this.ctx.moveTo(i * (BLOCK_SIZE + 1) + 1, 0);
-      this.ctx.lineTo(
-          i * (BLOCK_SIZE + 1) + 1, (BLOCK_SIZE + 1) * this.board.height + 1);
+      this.ctx.lineTo(i * (BLOCK_SIZE + 1) + 1, (BLOCK_SIZE + 1) * this.board.height + 1);
     }
 
     // Horizontal lines
     for (let j = 0; j <= this.board.height; j++) {
       this.ctx.moveTo(0, j * (BLOCK_SIZE + 1) + 1);
-      this.ctx.lineTo(
-          (BLOCK_SIZE + 1) * this.board.width + 1, j * (BLOCK_SIZE + 1) + 1);
+      this.ctx.lineTo((BLOCK_SIZE + 1) * this.board.width + 1, j * (BLOCK_SIZE + 1) + 1);
     }
 
     this.ctx.stroke();
-  };
+  }
 }
