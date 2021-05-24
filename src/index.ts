@@ -12,7 +12,8 @@ class Index {
   // don't need to be a class variable
   countButtons: HTMLButtonElement[] =
       Array.from(this.dialog.dialogElement.querySelectorAll('button'));
-  restartButton = document.querySelector('button.restart');
+  restartButton: HTMLButtonElement = document.querySelector('button.restart');
+  pauseButton: HTMLButtonElement = document.querySelector('button.pause');
 
   constructor() {
     this.initCanvas();
@@ -38,7 +39,20 @@ class Index {
       this.dialog.dialogElement.classList.remove('hide');
     });
 
+    this.pauseButton.addEventListener('click', () => {
+      const isPausing = this.pauseButton.innerText === 'Pause';
+      this.page.pauseGame(isPausing);
+      this.flipPauseButtons(isPausing);
+    });
+
     window.addEventListener('keydown', (event) => this.page.onKeyDown(event));
+  }
+
+  private flipPauseButtons(isPausing = true) {
+    const text = isPausing ? 'Resume' : 'Pause';
+    this.pauseButton.innerText = text;
+    this.pauseButton.classList.toggle('pause');
+    this.pauseButton.classList.toggle('resume');
   }
 }
 
