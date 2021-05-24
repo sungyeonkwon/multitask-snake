@@ -1,6 +1,12 @@
+- pause / resume fix
+- make a wall fix
+- add sound
+- styling update
+
 Nice to haves
 
-- accelleration
+- accelleration: If not drawing on the canvas but element with transform value, can animate with css.
+
 - make food shine? lol
 
 Fix
@@ -11,9 +17,8 @@ Fix
 
 TODO
 
-- button disabled / abled
+- background change for snake type
 - sound on/off button
-- make a wall feature
 - Add sound effects
 
 https://www.youtube.com/watch?v=19h1g22hby8&feature=emb_logo

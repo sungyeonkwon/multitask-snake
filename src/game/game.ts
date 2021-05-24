@@ -1,119 +1,14 @@
-import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, directionKeyMap, selectedSnakeKeyMap} from './constants';
-import {Coords, Direction, INIT_SNAKE_SIZE} from './constants';
-import {getNextCoords, getRandomCoords, getStartingCoords, isDirectionOpposite, requestInterval} from './helpers';
+import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, DEFAULT_GAME_CONFIG, directionKeyMap, FRAME_RATE, GameConfig, selectedSnakeKeyMap} from '../constants';
+import {Coords, Direction, INIT_SNAKE_SIZE, SNAKES, SnakeType} from '../constants';
+import {getFullPattern, getNextCoords, getRandomCoords, getStartingCoords, isDirectionOpposite, requestInterval} from '../helpers';
+import {Dialog, DialogState} from '../ui/dialog';
+import {Board} from './board';
+import {Snake} from './snake';
 
 enum Progress {
   START = 1,
   PAUSE,
   RESET,
-}
-
-export class Snake {
-  sequence: Coords[] = [];
-  direction = Direction.RIGHT;
-
-  constructor(start: Coords) {
-    let count = INIT_SNAKE_SIZE;
-    this.sequence.push(start);
-
-    while (count > 0) {
-      const next = getNextCoords(
-          this.sequence[this.sequence.length - 1], Direction.LEFT);
-      this.sequence.push(next);
-      count--;
-    }
-  }
-
-  get head(): Coords {
-    return this.sequence[0];
-  }
-
-  get newHead(): Coords {
-    return getNextCoords(this.sequence[0], this.direction);
-  }
-
-  setDirection(direction: Direction) {
-    if (isDirectionOpposite(direction, this.direction)) return;
-    this.direction = direction;
-  }
-
-  grow() {
-    const next =
-        getNextCoords(this.sequence[this.sequence.length - 1], this.direction);
-    this.sequence.push(next);
-  }
-
-  step() {
-    this.sequence.pop();
-    this.sequence.unshift(this.newHead);
-  }
-}
-
-export class Board {
-  snakes?: Snake[];
-  bounds: Coords;
-  selectedSnake = 0;
-  food: Coords[] = [];
-  private _snakeCount?: number;
-
-  constructor(width: number, height: number) {
-    this.bounds = {x: width, y: height};
-  }
-
-  get width(): number {
-    return this.bounds.x;
-  }
-
-  get height(): number {
-    return this.bounds.y;
-  }
-
-  get snakeCount(): number {
-    return this._snakeCount;
-  }
-
-  setSnakeCount(count: number) {
-    this._snakeCount = count;
-  }
-
-  canProceed() {
-    for (let i = 0; i < this.snakes.length; i++) {
-      const snake = this.snakes[i];
-      const hasWallHit = this.bumpToWall(snake.newHead);
-      if (hasWallHit) return false;
-    }
-    return true;
-  }
-
-  // TODO
-  bumpToSnake(newHead: Coords, snake: Snake): boolean {
-    return false;
-    // return snake.sequence.some(
-    //     segment => segment.x === newHead.x && segment.y === newHead.y);
-  }
-
-  bumpToWall(newHead: Coords): boolean {
-    return newHead.x < 0 || newHead.y < 0 || newHead.x >= this.bounds.x ||
-        newHead.y >= this.bounds.y;
-  }
-
-  tick(): boolean {
-    for (let i = 0; i < this.snakes.length; i++) {
-      const snake = this.snakes[i];
-      snake.step();
-
-      const foodIndex = this.food.findIndex(
-          (item) => item.x === snake.newHead.x && item.y === snake.newHead.y);
-
-      if (foodIndex >= 0) {
-        snake.grow();
-        this.food.splice(foodIndex, 1);
-        this.food.push(getRandomCoords(this.bounds));
-        return true;
-      }
-    }
-    return false;
-  }
 }
 
 export class Page {
@@ -123,7 +18,8 @@ export class Page {
   ctx: CanvasRenderingContext2D;
   speed?: number;
   eatCount = 0;
-  dialog: HTMLElement = document.querySelector('.dialog');
+  dialog = new Dialog();
+  // dialog: HTMLElement = document.querySelector('.dialog');
   foodInfo: HTMLElement = document.querySelector('.food');
   gameOverContainer: HTMLElement = document.querySelector('.gameover');
   isPaused = false;
@@ -135,9 +31,19 @@ export class Page {
     this.drawGrid();
   }
 
-  init(snakeCount: number) {
-    this.board.setSnakeCount(snakeCount);
+  // Add throttle
+  onKeyDown = (event: KeyboardEvent) => {
+    const direction = directionKeyMap.get(event.code);
+    if (direction) {
+      const snake = this.board.snakes.find(
+          (_, index) => index === this.board.selectedSnake);
+      snake.setDirection(direction);
+    }
+    const index = selectedSnakeKeyMap.get(event.code);
+    if (index) this.board.selectedSnake = index - 1;
+  };
 
+  startGame() {
     // populate snakes
     const snakes: Snake[] = [];
     const food: Coords[] = [];
@@ -154,22 +60,10 @@ export class Page {
     this.render();
   }
 
-  // Add throttle
-  onKeyDown = (event: KeyboardEvent) => {
-    const direction = directionKeyMap.get(event.code);
-    if (direction) {
-      const snake = this.board.snakes.find(
-          (_, index) => index === this.board.selectedSnake);
-      snake.setDirection(direction);
-    }
-    const index = selectedSnakeKeyMap.get(event.code);
-    if (index) this.board.selectedSnake = index - 1;
-  };
-
   stopGame() {
     cancelAnimationFrame(this.intervalId.value);
-    this.dialog.classList.remove('hide');
-    this.gameOverContainer.classList.add('show');
+    this.board.resetBoard();
+    this.dialog.setDialogState(DialogState.GAME_OVER);
   }
 
   pauseGame(isPausing = true) {
@@ -182,13 +76,14 @@ export class Page {
 
       if (!this.board.canProceed()) {
         this.stopGame();
-        this.gameOverContainer.classList.add('show');
         return;
       }
 
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
       this.drawGrid();
       this.drawFood();
+      this.drawWall();
 
       const hasEaten = this.board.tick();
 
@@ -200,8 +95,18 @@ export class Page {
       this.board.snakes.forEach((snake, snakeIndex) => {
         this.drawSnake(snake, snakeIndex);
       });
-    }, 300);
+    }, 400);
   };
+
+  drawWall() {
+    this.ctx.beginPath();
+    this.ctx.fillStyle = Color.WALL;
+    this.board.wall.forEach((item) => {
+      this.ctx.fillRect(
+          item.x * (BLOCK_SIZE + 1) + 1, item.y * (BLOCK_SIZE + 1) + 1,
+          BLOCK_SIZE, BLOCK_SIZE);
+    });
+  }
 
   // to make it smooth, it just needs to be granular and not fixed by block.
   drawSnake(snake: Snake, snakeIndex: number) {
@@ -210,9 +115,10 @@ export class Page {
     const isSnakeSelected = snakeIndex === this.board.selectedSnake;
 
     // Fill body
-    this.ctx.fillStyle =
-        isSnakeSelected ? Color.SNAKE_BODY_SELECTED : Color.SNAKE_BODY;
-    snake.sequence.forEach((coords) => {
+    const pattern = SNAKES.find(s => s.type === this.board.snakeType).pattern;
+    const fullPattern = getFullPattern(pattern, snake.sequence.length)
+    snake.sequence.forEach((coords, index) => {
+      this.ctx.fillStyle = fullPattern[index];
       this.ctx.fillRect(
           coords.x * (BLOCK_SIZE + 1) + 1, coords.y * (BLOCK_SIZE + 1) + 1,
           BLOCK_SIZE, BLOCK_SIZE);

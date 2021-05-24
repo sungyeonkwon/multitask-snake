@@ -37,12 +37,13 @@ const oppositeDirections = {
   [Direction.RIGHT]: Direction.LEFT,
 };
 
-export function isDirectionOpposite(original: Direction, changed: Direction): boolean {
+export function isDirectionOpposite(
+    original: Direction, changed: Direction): boolean {
   if (oppositeDirections[original] === changed) return true;
   return false;
 }
 
-export const requestInterval = function (fn, delay: number) {
+export const requestInterval = function(fn, delay: number) {
   let start = new Date().getTime();
   const handle = {};
 
@@ -59,3 +60,12 @@ export const requestInterval = function (fn, delay: number) {
 
   return handle;
 };
+
+/** Repeats the pattern segments till the array size reaches the limit. */
+export function getFullPattern(pattern: string[], limit: number): string[] {
+  let fullPattern = [];
+  for (let i = 0; i < limit; i++) {
+    fullPattern.push(pattern[i % pattern.length]);
+  }
+  return fullPattern;
+}
