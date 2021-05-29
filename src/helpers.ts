@@ -8,11 +8,20 @@ export function getStartingCoords(snakeCount: number, index: number) {
 }
 
 // TODO: exclude array of coords
-export function getRandomCoords(bounds: Coords): Coords {
-  return {
+export function getRandomCoords(
+    bounds: Coords, excludeArray: Coords[]): Coords {
+  let randomCoords = {
     x: Math.floor(Math.random() * bounds.x),
     y: Math.floor(Math.random() * bounds.y),
   };
+  while (excludeArray.find(
+      coords => coords.x === randomCoords.x && coords.y === randomCoords.y)) {
+    randomCoords = {
+      x: Math.floor(Math.random() * bounds.x),
+      y: Math.floor(Math.random() * bounds.y),
+    };
+  }
+  return randomCoords;
 }
 
 export function getNextCoords(coords: Coords, direction: Direction): Coords {

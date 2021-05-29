@@ -1,8 +1,6 @@
-- pause / resume fix
-- make a wall fix
+- make wall drawable on pause
 - add sound
 - styling update
-- add debug mode with grid numbers
 
 Nice to haves
 

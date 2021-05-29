@@ -14,11 +14,11 @@
   left: 50%;
   opacity: 1;
   top: 50%;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s ease, transform 0.9s ease;
   transform: translate(-50%, -50%);
 
   &.hide {
-    display: none;
+    transform: translate(-50%, -140vh);
   }
 
   h1 {

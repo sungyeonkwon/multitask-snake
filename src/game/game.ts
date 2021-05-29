@@ -22,7 +22,6 @@ export class Page {
   // dialog: HTMLElement = document.querySelector('.dialog');
   foodInfo: HTMLElement = document.querySelector('.food');
   gameOverContainer: HTMLElement = document.querySelector('.gameover');
-  isPaused = false;
 
   constructor(canvas: HTMLCanvasElement) {
     this.board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
@@ -52,7 +51,9 @@ export class Page {
     for (let i = 0; i < this.board.snakeCount; i++) {
       const coords = getStartingCoords(this.board.snakeCount, i);
       snakes.push(new Snake(coords));
-      const newFood = getRandomCoords(this.board.bounds);
+
+      // exclude snakes and walls
+      const newFood = getRandomCoords(this.board.bounds, []);
       food.push(newFood);
     }
 
@@ -63,20 +64,21 @@ export class Page {
   }
 
   stopGame() {
-    console.log('stop game');
     cancelAnimationFrame(this.intervalId.value);
     this.dialog.setDialogState(DialogState.GAME_OVER);
   }
 
   pauseGame(isPausing = true) {
-    this.isPaused = isPausing;
+    if (isPausing) {
+      cancelAnimationFrame(this.intervalId.value);
+    } else {
+      this.render();
+    }
   }
 
   render = () => {
     this.intervalId = requestInterval(
         () => {
-          if (this.isPaused) return;
-
           if (!this.board.canProceed()) {
             this.stopGame();
             return;
@@ -99,14 +101,13 @@ export class Page {
             this.drawSnake(snake, snakeIndex);
           });
         },
-        1000,
+        400,
         () => {
           this.drawWall();
         });
   };
 
   drawWall() {
-    console.log('this.board.wall', this.board.wall);
     this.ctx.beginPath();
     this.ctx.fillStyle = Color.WALL;
     this.board.wall.forEach((item) => {

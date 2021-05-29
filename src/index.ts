@@ -46,9 +46,6 @@ class Index {
       gridRow.appendChild(span);
     }
     document.querySelector('.container').prepend(gridRow);
-
-
-    // TODO: append grid
   }
 
   private getDebugMode() {
@@ -143,7 +140,6 @@ class Index {
     });
 
     this.eraserButton.addEventListener('click', () => {
-      console.log('eraser');
       this.addShouldRecordListeners();
 
       // Add throttle

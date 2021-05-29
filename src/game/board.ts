@@ -49,8 +49,6 @@ export class Board {
       const hitWall = this.bumpToWall(snake.newHead);
       const hitSelf = this.bumpToSnake(snake.newHead);
       if (hitWall || hitSelf) {
-        console.log('hitWall', hitWall);
-        console.log('hitSelf', hitSelf);
         return false;
       }
     }
@@ -86,8 +84,6 @@ export class Board {
   }
 
   removeWalls(x: number, y: number) {
-    const block: Coords = {x, y};
-
     const index =
         this.wall.findIndex((block) => block.x === x && block.y === y);
     if (index >= 0) {
