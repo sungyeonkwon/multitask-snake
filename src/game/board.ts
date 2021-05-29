@@ -69,8 +69,6 @@ export class Board {
         newHead.x >= this.bounds.x || newHead.y >= this.bounds.y;
     const bumpedToCustomWalls =
         this.wall.find(({x, y}) => x === newHead.x && y === newHead.y);
-    console.log('bumpedToEdges', bumpedToEdges);
-    console.log('bumpedToCustomWalls', bumpedToCustomWalls);
     return bumpedToEdges || !!bumpedToCustomWalls;
   }
 
