@@ -43,7 +43,8 @@ export function isDirectionOpposite(
   return false;
 }
 
-export const requestInterval = function(fn, delay: number) {
+// fn2 is for every frame
+export const requestInterval = function(fn, delay: number, fn2) {
   let start = new Date().getTime();
   const handle = {};
 
@@ -51,6 +52,8 @@ export const requestInterval = function(fn, delay: number) {
     handle.value = window.requestAnimationFrame(loop);
     const current = new Date().getTime();
     const delta = current - start;
+    fn2 && fn2.call();
+
     if (delta >= delay) {
       fn.call();
       start = new Date().getTime();

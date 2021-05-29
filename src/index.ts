@@ -12,6 +12,7 @@ enum Selector {
 }
 
 class Index {
+  isDebugMode = this.getDebugMode();
   canvas = document.querySelector('canvas');
   page = new Page(this.canvas);
   dialog = this.page.dialog;
@@ -28,7 +29,32 @@ class Index {
     this.initCanvas();
     this.addListeners();
     this.updateSelectedConfig();
+    this.enableDebugMode();
     console.log('debounce', debounce);
+  }
+
+  private enableDebugMode() {
+    if (!this.isDebugMode) return;
+
+    console.log('enableDebugMode');
+    const gridRow = document.createElement('div');
+    gridRow.classList.add('debug');
+
+    for (let i = 0; i < BOARD_WIDTH; i++) {
+      const span = document.createElement('span');
+      span.innerText = String(i + 1);
+      gridRow.appendChild(span);
+    }
+    document.querySelector('.container').prepend(gridRow);
+
+
+    // TODO: append grid
+  }
+
+  private getDebugMode() {
+    var url = new URL(window.location.href);
+    var params = new URLSearchParams(url.search);
+    return params.get('debug');
   }
 
   initCanvas() {
@@ -56,6 +82,17 @@ class Index {
     })
   }
 
+  addShouldRecordListeners() {
+    window.addEventListener('mousedown', () => {
+      this.shouldRecord = true;
+      document.body.style.cursor = 'crosshair';
+    });
+
+    window.addEventListener('mouseup', () => {
+      this.shouldRecord = false;
+      document.body.style.cursor = 'default';
+    });
+  }
 
   addListeners() {
     // snake count listener
@@ -88,15 +125,7 @@ class Index {
     });
 
     this.pencilButton.addEventListener('click', () => {
-      window.addEventListener('mousedown', () => {
-        this.shouldRecord = true;
-        document.body.style.cursor = 'crosshair';
-      });
-
-      window.addEventListener('mouseup', () => {
-        this.shouldRecord = false;
-        document.body.style.cursor = 'default';
-      });
+      this.addShouldRecordListeners();
 
       // Add throttle
       window.addEventListener('mousemove', (event: MouseEvent) => {
@@ -104,14 +133,32 @@ class Index {
 
         const {pageX, pageY} = event;
         const {left, top} = this.canvas.getBoundingClientRect();
-        const normalisedX = Math.floor((pageX - left) / BLOCK_SIZE);
-        const normalisedY = Math.floor((pageY - top) / BLOCK_SIZE);
+        const l = pageX - left;
+        const r = pageY - top;
+
+        const normalisedX = Math.floor(l / (BLOCK_SIZE + 1));
+        const normalisedY = Math.floor(r / (BLOCK_SIZE + 1));
         this.page.board.setWalls(normalisedX, normalisedY);
       }, false);
     });
 
     this.eraserButton.addEventListener('click', () => {
       console.log('eraser');
+      this.addShouldRecordListeners();
+
+      // Add throttle
+      window.addEventListener('mousemove', (event: MouseEvent) => {
+        if (!this.shouldRecord) return;
+
+        const {pageX, pageY} = event;
+        const {left, top} = this.canvas.getBoundingClientRect();
+        const l = pageX - left;
+        const r = pageY - top;
+
+        const normalisedX = Math.floor(l / (BLOCK_SIZE + 1));
+        const normalisedY = Math.floor(r / (BLOCK_SIZE + 1));
+        this.page.board.removeWalls(normalisedX, normalisedY);
+      }, false);
     });
 
     window.addEventListener('keydown', (event) => this.page.onKeyDown(event));

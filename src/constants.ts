@@ -62,9 +62,10 @@ export const SNAKES = [
   {
     type: SnakeType.ANILIUS,
     pattern: [
-      'red',
+      'pink',
       'blue',
-      'red',
+      'orange',
+      'pink',
     ]
   },
 ];

@@ -46,15 +46,18 @@ export class Board {
   canProceed() {
     for (let i = 0; i < this.snakes.length; i++) {
       const snake = this.snakes[i];
-      const hasHitWall = this.bumpToWall(snake.newHead);
-      const hasHitSelf = this.bumpToSnake(snake.newHead);
-      if (hasHitWall || hasHitSelf) return false;
+      const hitWall = this.bumpToWall(snake.newHead);
+      const hitSelf = this.bumpToSnake(snake.newHead);
+      if (hitWall || hitSelf) {
+        console.log('hitWall', hitWall);
+        console.log('hitSelf', hitSelf);
+        return false;
+      }
     }
     return true;
   }
 
   private bumpToSnake(newHead: Coords): boolean {
-    console.log('bumpToSnake');
     return this.snakes.some(snake => {
       return snake.sequence.some(
           segment => segment.x === newHead.x && segment.y === newHead.y);
@@ -62,19 +65,36 @@ export class Board {
   }
 
   private bumpToWall(newHead: Coords): boolean {
-    console.log('bumpToWall');
     const bumpedToEdges = newHead.x < 0 || newHead.y < 0 ||
         newHead.x >= this.bounds.x || newHead.y >= this.bounds.y;
     const bumpedToCustomWalls =
-        this.wall.find(({x, y}) => x === newHead.x && newHead.y);
+        this.wall.find(({x, y}) => x === newHead.x && y === newHead.y);
+    console.log('bumpedToEdges', bumpedToEdges);
+    console.log('bumpedToCustomWalls', bumpedToCustomWalls);
     return bumpedToEdges || !!bumpedToCustomWalls;
   }
 
   setWalls(x: number, y: number) {
-    const newWallBlock: Coords = {x, y};
-    // if (!this.wall.find((block) => block.x === x && block.y)) {
-    this.wall.push(newWallBlock);
-    // }
+    const block: Coords = {x, y};
+
+    const isNotAlreadyWall =
+        !this.wall.find((block) => block.x === x && block.y === y);
+    const isNotPartofSnake = !this.snakes.find(snake => {
+      return snake.sequence.find(segment => segment.x === x && segment.y === y);
+    });
+    if (isNotAlreadyWall && isNotPartofSnake) {
+      this.wall.push(block);
+    }
+  }
+
+  removeWalls(x: number, y: number) {
+    const block: Coords = {x, y};
+
+    const index =
+        this.wall.findIndex((block) => block.x === x && block.y === y);
+    if (index >= 0) {
+      this.wall.splice(index, 1);
+    }
   }
 
   tick(): boolean {

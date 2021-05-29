@@ -2,6 +2,7 @@
 - make a wall fix
 - add sound
 - styling update
+- add debug mode with grid numbers
 
 Nice to haves
 

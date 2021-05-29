@@ -44,6 +44,8 @@ export class Page {
   };
 
   startGame() {
+    this.board.resetBoard();
+
     // populate snakes
     const snakes: Snake[] = [];
     const food: Coords[] = [];
@@ -61,8 +63,8 @@ export class Page {
   }
 
   stopGame() {
+    console.log('stop game');
     cancelAnimationFrame(this.intervalId.value);
-    this.board.resetBoard();
     this.dialog.setDialogState(DialogState.GAME_OVER);
   }
 
@@ -71,34 +73,40 @@ export class Page {
   }
 
   render = () => {
-    this.intervalId = requestInterval(() => {
-      if (this.isPaused) return;
+    this.intervalId = requestInterval(
+        () => {
+          if (this.isPaused) return;
 
-      if (!this.board.canProceed()) {
-        this.stopGame();
-        return;
-      }
+          if (!this.board.canProceed()) {
+            this.stopGame();
+            return;
+          }
 
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      this.drawGrid();
-      this.drawFood();
-      this.drawWall();
+          this.drawGrid();
+          this.drawWall();
+          this.drawFood();
 
-      const hasEaten = this.board.tick();
+          const hasEaten = this.board.tick();
 
-      if (hasEaten) {
-        this.eatCount++;
-        this.foodInfo.innerText = this.eatCount.toString();
-      }
+          if (hasEaten) {
+            this.eatCount++;
+            this.foodInfo.innerText = this.eatCount.toString();
+          }
 
-      this.board.snakes.forEach((snake, snakeIndex) => {
-        this.drawSnake(snake, snakeIndex);
-      });
-    }, 400);
+          this.board.snakes.forEach((snake, snakeIndex) => {
+            this.drawSnake(snake, snakeIndex);
+          });
+        },
+        1000,
+        () => {
+          this.drawWall();
+        });
   };
 
   drawWall() {
+    console.log('this.board.wall', this.board.wall);
     this.ctx.beginPath();
     this.ctx.fillStyle = Color.WALL;
     this.board.wall.forEach((item) => {
