@@ -1,4 +1,5 @@
-import {Coords, DEFAULT_GAME_CONFIG, SnakeType} from '../constants';
+import {ReplaySubject} from 'rxjs';
+import {Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType} from '../constants';
 import {getRandomCoords} from '../helpers';
 import {Snake} from './snake';
 
@@ -10,6 +11,7 @@ export class Board {
   wall: Coords[] = [];
   private _snakeCount = DEFAULT_GAME_CONFIG.snakeCount;
   private _snakeType = DEFAULT_GAME_CONFIG.snakeType;
+  deathReason$ = new ReplaySubject<GameOver|null>(1);
 
   constructor(width: number, height: number) {
     this.bounds = {x: width, y: height};
@@ -41,14 +43,19 @@ export class Board {
 
   resetBoard() {
     this.wall = [];
+    this.deathReason$.next(null);
   }
 
-  canProceed() {
+  canProceed(): boolean {
     for (let i = 0; i < this.snakes.length; i++) {
       const snake = this.snakes[i];
       const hitWall = this.bumpToWall(snake.newHead);
       const hitSelf = this.bumpToSnake(snake.newHead);
-      if (hitWall || hitSelf) {
+      if (hitWall) {
+        this.deathReason$.next(GameOver.HIT_WALL);
+        return false;
+      } else if (hitSelf) {
+        this.deathReason$.next(GameOver.HIT_SELF);
         return false;
       }
     }
@@ -102,7 +109,8 @@ export class Board {
       if (foodIndex >= 0) {
         snake.grow();
         this.food.splice(foodIndex, 1);
-        this.food.push(getRandomCoords(this.bounds));
+        // TODO: exclude snakes and walls
+        this.food.push(getRandomCoords(this.bounds, []));
         return true;
       }
     }

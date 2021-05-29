@@ -1,11 +1,21 @@
 {
   "compilerOptions": {
     "outDir": "./dist/",
+    "module": "commonjs",
     "sourceMap": true,
+    "moduleResolution": "node",
     "noImplicitAny": true,
-    "module": "es6",
+    // "module": "es6",
     "target": "ES2017",
     "jsx": "react",
-    "allowJs": true
+    "allowJs": true,
+    "paths": {
+      "rxjs": [
+        "./node_modules/rxjs"
+      ],
+      "rxjs/*" : [
+        "./node_modules/rxjs/*"
+      ]
+    }
   }
 }

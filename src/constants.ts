@@ -1,8 +1,13 @@
 export const BOARD_WIDTH = 50;
-export const BOARD_HEIGHT = 30;
+export const BOARD_HEIGHT = 25;
 export const BLOCK_SIZE = 20;
 export const FRAME_RATE = 10;
 export const INIT_SNAKE_SIZE = 5;
+
+export enum GameOver {
+  HIT_SELF = 1,
+  HIT_WALL = 2,
+}
 
 export enum SnakeType {
   VIPER = 'Viper',
@@ -15,7 +20,7 @@ export enum SnakeType {
 
 export const DEFAULT_GAME_CONFIG: GameConfig = {
   snakeType: SnakeType.VIPER,
-  snakeCount: 3,
+  snakeCount: 2,
 }
 
 export interface GameConfig {
@@ -49,7 +54,7 @@ export const SNAKES = [
     type: SnakeType.ANACONDA,
     pattern: [
       'yellow',
-      'black',
+      'grey',
     ]
   },
   {
@@ -73,13 +78,13 @@ export const SNAKES = [
 export const MAX_SNAKES_COUNT = 5;
 
 export enum Color {
-  GRID = 'lightgrey',
+  GRID = 'rgb(38, 38, 38)',
   SNAKE_HEAD = 'white',
-  SNAKE_HEAD_SELECTED = 'black',
+  SNAKE_HEAD_SELECTED = 'red',
   SNAKE_HEAD_TEXT = 'black',
   SNAKE_HEAD_TEXT_SELECTED = 'white',
-  FOOD = 'blue',
-  WALL = 'black',
+  FOOD = 'lightgreen',
+  WALL = 'red',
 }
 
 export enum Direction {

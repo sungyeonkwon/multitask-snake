@@ -2,6 +2,7 @@ import {BehaviorSubject} from 'rxjs';
 import {SNAKES} from '../constants';
 import {getFullPattern} from '../helpers';
 
+// TODO: rename to game state and use it for disabling the buttons
 export enum DialogState {
   GAME_CONFIG = 1,
   HIDDEN,
@@ -29,6 +30,7 @@ export class Dialog {
     this.dialogState$.subscribe((state: DialogState) => {
       switch (state) {
         case DialogState.HIDDEN:
+          this.dialogElement.classList.add('transition');
           this.dialogElement.classList.add('hide');
           return;
         case DialogState.GAME_CONFIG:
@@ -38,9 +40,6 @@ export class Dialog {
         case DialogState.GAME_OVER:
           this.dialogElement.classList.remove('hide');
           this.dialogElement.classList.add('gameover');
-          document.querySelector('button.restart')
-              .addEventListener(
-                  'click', () => this.setDialogState(DialogState.GAME_CONFIG));
           return;
         default:
           return;
@@ -48,7 +47,11 @@ export class Dialog {
     })
   }
 
-  setDialogState(state: DialogState) {
+  setDialogState(state: DialogState, gameOverMessage = '') {
+    if (gameOverMessage) {
+      (document.querySelector('.message') as HTMLParagraphElement).innerText =
+          gameOverMessage;
+    }
     this.dialogState$.next(state);
   }
 
@@ -78,21 +81,30 @@ export class Dialog {
   getTemplate() {
     return `
       <div class="gameover-container">
-        <h1>Game Over</h1>
+        <h1>* Game over *</h1>
+        <p class="message"></p>
         <button class="restart">Restart</button>
       </div>
       <div class="config-container">
-        <h1>Choose your snakes</h1>
         <div class="type-container">
-          ${this.getSnakesTemplate()}
+          <h1 class="subheader">Choose your snakes</h1>
+          <div>
+            <div class="pad"></div>
+            <div class="scroller">
+              ${this.getSnakesTemplate()}
+            </div>
+          </div>
         </div>
-        <h1>How many snakes can you handle?</h1>
+
         <div class="count-container">
-          <button class="count" data-count="1" type="button">× 1</button>
-          <button class="count" data-count="2" type="button">× 2</button>
-          <button class="count" data-count="3" type="button">× 3</button>
-          <button class="count" data-count="4" type="button">× 4</button>
-          <button class="count" data-count="5" type="button">× 5</button>
+        <h1 class="subheader">How many snakes can you handle?</h1>
+          <div>
+            <button class="count" data-count="1" type="button">× 1</button>
+            <button class="count" data-count="2" type="button">× 2</button>
+            <button class="count" data-count="3" type="button">× 3</button>
+            <button class="count" data-count="4" type="button">× 4</button>
+            <button class="count" data-count="5" type="button">× 5</button>
+          </div>
         </div>
         <button class="start" type="button">Start game</button>
       </div>

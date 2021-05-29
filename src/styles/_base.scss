@@ -1,21 +1,130 @@
 * {
   box-sizing: border-box;
+  font: 24px 'VT323';
+  letter-spacing: 1px;
 }
 
 button {
-  font: 22px 'IBM Plex Mono';
   cursor: pointer;
-  border: 4px solid black;
-  padding: 2px 8px;
-  color: black;
-  background: lightgreen;
-  margin: 10px;
+  border: 4px solid rgb(186, 186, 186);
+  padding: 8px 12px;
+  color: rgb(154, 154, 154);
+  background: $lightgreen;
+  box-shadow: 6px 6px rgb(8, 8, 66);
+  transition: transform 0.2s ease;
 
   &:hover {
+    color: red;
     border: 4px solid red;
   }
 
   &.selected {
-    border: 4px solid yellow;
+    transform: translate(0px, 6px);
+    box-shadow: none;
+    color: red;
+    background: black;
+    border: 4px solid red;
+  }
+}
+
+body {
+  font-family: 'VT323', monospace;
+  background: rgb(37, 37, 37);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.logo {
+  position: absolute;
+  left: 50%;
+  color: lightgray;
+  top: 10px;
+  font-size: 24px;
+  transform: translateX(-50%);
+}
+
+canvas {
+  background: black;
+  border: 4px solid rgb(104, 104, 104);
+}
+
+.dashboard {
+  color: white;
+  background: darkblue;
+  padding: 3px 10px;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+
+  span {
+    font-size: 18px;
+    margin: 0;
+  }
+}
+
+.control {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  button:nth-child(2) {
+    margin-left: 10px;
+  }
+}
+
+.container {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.debug {
+  width: 100%;
+  background: black;
+  color: white;
+  display: flex;
+  border: 4px solid lightcoral;
+  justify-content: space-around;
+  height: 30px;
+  font-size: 9px;
+
+  span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    border: 1px solid white;
+  }
+}
+
+.outside-button-container {
+  position: absolute;
+  left: 30px;
+  top: 30px;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+
+  p {
+    font-size: 18px;
+    color: darkgray;
+  }
+
+  button {
+    font-size: 18px;
+    text-align: left;
+    background: none;
+    margin: 0;
+    border: none;
+    padding: 0;
   }
 }

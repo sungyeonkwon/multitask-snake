@@ -1,23 +1,10 @@
-- make wall drawable on pause
-- add sound
-- styling update
+# Multitasking snake game (WIP)
 
-Nice to haves
+Snake game, but a lot of them because multitasking is hard. This needs more work / clean up.
 
-- accelleration: If not drawing on the canvas but element with transform value, can animate with css.
+https://multitasking-snake.xyz/
 
-- make food shine? lol
+### Feature to add
 
-Fix
--rapid direction change?
--> debounce
-
--> select snake
-
-TODO
-
-- background change for snake type
-- sound on/off button
-- Add sound effects
-
-https://www.youtube.com/watch?v=19h1g22hby8&feature=emb_logo
+- [ ] Add sound on/off button
+- [ ] Make food shine

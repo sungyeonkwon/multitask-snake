@@ -1,15 +1,14 @@
-import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, DEFAULT_GAME_CONFIG, directionKeyMap, FRAME_RATE, GameConfig, selectedSnakeKeyMap} from '../constants';
-import {Coords, Direction, INIT_SNAKE_SIZE, SNAKES, SnakeType} from '../constants';
-import {getFullPattern, getNextCoords, getRandomCoords, getStartingCoords, isDirectionOpposite, requestInterval} from '../helpers';
+import {take} from 'rxjs/operators';
+
+import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, directionKeyMap, GameOver, selectedSnakeKeyMap} from '../constants';
+import {Coords, SNAKES} from '../constants';
+import {getFullPattern, getRandomCoords, getStartingCoords, requestInterval} from '../helpers';
 import {Dialog, DialogState} from '../ui/dialog';
+
 import {Board} from './board';
 import {Snake} from './snake';
 
-enum Progress {
-  START = 1,
-  PAUSE,
-  RESET,
-}
+const INTERVAL = 500;
 
 export class Page {
   intervalId: any;  // fix
@@ -19,9 +18,10 @@ export class Page {
   speed?: number;
   eatCount = 0;
   dialog = new Dialog();
-  // dialog: HTMLElement = document.querySelector('.dialog');
   foodInfo: HTMLElement = document.querySelector('.food');
+  wallInfo: HTMLElement = document.querySelector('.wall');
   gameOverContainer: HTMLElement = document.querySelector('.gameover');
+  isGamePlaying = false;
 
   constructor(canvas: HTMLCanvasElement) {
     this.board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
@@ -52,7 +52,8 @@ export class Page {
       const coords = getStartingCoords(this.board.snakeCount, i);
       snakes.push(new Snake(coords));
 
-      // exclude snakes and walls
+
+      // TODO: exclude snakes and walls
       const newFood = getRandomCoords(this.board.bounds, []);
       food.push(newFood);
     }
@@ -61,11 +62,19 @@ export class Page {
     this.board.food = food;
 
     this.render();
+    this.isGamePlaying = true;
   }
 
   stopGame() {
     cancelAnimationFrame(this.intervalId.value);
-    this.dialog.setDialogState(DialogState.GAME_OVER);
+    // TODO: take(1)
+    this.board.deathReason$.pipe().subscribe((reason: GameOver) => {
+      if (!reason) return;
+      this.dialog.setDialogState(
+          DialogState.GAME_OVER, this.getGameOverMessage(reason));
+    });
+
+    // TODO: disable wall / pause
   }
 
   pauseGame(isPausing = true) {
@@ -74,53 +83,102 @@ export class Page {
     } else {
       this.render();
     }
+    this.isGamePlaying = !this.isGamePlaying;
   }
 
-  render = () => {
-    this.intervalId = requestInterval(
-        () => {
-          if (!this.board.canProceed()) {
-            this.stopGame();
-            return;
-          }
+  render(renderWallOnly = false) {
+    // called interval-ly
+    this.intervalId = requestInterval(() => {
+      if (!this.board.canProceed()) {
+        this.stopGame();
+        return;
+      }
 
-          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.drawAll();
 
-          this.drawGrid();
-          this.drawWall();
-          this.drawFood();
+      if (renderWallOnly) return;
 
-          const hasEaten = this.board.tick();
-
-          if (hasEaten) {
-            this.eatCount++;
-            this.foodInfo.innerText = this.eatCount.toString();
-          }
-
-          this.board.snakes.forEach((snake, snakeIndex) => {
-            this.drawSnake(snake, snakeIndex);
-          });
-        },
-        400,
-        () => {
-          this.drawWall();
-        });
+      const hasEaten = this.board.tick();
+      if (hasEaten) {
+        this.eatCount++;
+        this.foodInfo.innerText = this.eatCount.toString();
+      }
+    }, INTERVAL, () => this.drawAll());
   };
 
-  drawWall() {
-    this.ctx.beginPath();
-    this.ctx.fillStyle = Color.WALL;
-    this.board.wall.forEach((item) => {
-      this.ctx.fillRect(
-          item.x * (BLOCK_SIZE + 1) + 1, item.y * (BLOCK_SIZE + 1) + 1,
-          BLOCK_SIZE, BLOCK_SIZE);
+  private drawAll() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawGrid();
+    this.drawWall();
+    this.drawFood();
+    this.board.snakes.forEach((snake, snakeIndex) => {
+      this.drawSnake(snake, snakeIndex);
     });
+    this.wallInfo.innerText = this.board.wall.length.toString();
+  }
+
+  private drawGrid() {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = Color.GRID;
+
+    // Vertical lines
+    for (let i = 0; i <= this.board.width; i++) {
+      this.ctx.moveTo(i * (BLOCK_SIZE + 1) + 1, 0);
+      this.ctx.lineTo(
+          i * (BLOCK_SIZE + 1) + 1, (BLOCK_SIZE + 1) * this.board.height + 1);
+    }
+
+    // Horizontal lines
+    for (let j = 0; j <= this.board.height; j++) {
+      this.ctx.moveTo(0, j * (BLOCK_SIZE + 1) + 1);
+      this.ctx.lineTo(
+          (BLOCK_SIZE + 1) * this.board.width + 1, j * (BLOCK_SIZE + 1) + 1);
+    }
+
+    this.ctx.stroke();
+  }
+
+  private drawWall() {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = Color.WALL;
+    this.board.wall.forEach((item) => {
+      this.ctx.lineWidth = 7;
+      // '+' shape
+      // this.ctx.moveTo(
+      //     item.x * (BLOCK_SIZE + 1) + 1,
+      //     item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2);
+      // this.ctx.lineTo(
+      //     item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE,
+      //     item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2);
+      // this.ctx.moveTo(
+      //     item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2,
+      //     item.y * (BLOCK_SIZE + 1) + 1);
+      // this.ctx.lineTo(
+      //     item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2,
+      //     item.y * (BLOCK_SIZE + 1) + BLOCK_SIZE + 1);
+
+
+      // 'x' shape
+      this.ctx.moveTo(
+          item.x * (BLOCK_SIZE + 1) + 1, item.y * (BLOCK_SIZE + 1) + 1);
+      this.ctx.lineTo(
+          item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE,
+          item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE);
+      this.ctx.moveTo(
+          item.x * (BLOCK_SIZE + 1) + 1,
+          item.y * (BLOCK_SIZE + 1) + BLOCK_SIZE + 1);
+      this.ctx.lineTo(
+          item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE,
+          item.y * (BLOCK_SIZE + 1) + 1);
+    });
+    this.ctx.stroke();
+    this.ctx.lineWidth = 1;
   }
 
   // to make it smooth, it just needs to be granular and not fixed by block.
-  drawSnake(snake: Snake, snakeIndex: number) {
+  private drawSnake(snake: Snake, snakeIndex: number) {
     const {x, y} = snake.head;
-    const PADDING = 2;
+    const PADDING = 4;
     const isSnakeSelected = snakeIndex === this.board.selectedSnake;
 
     // Fill body
@@ -143,42 +201,34 @@ export class Page {
     // Fill number
     this.ctx.fillStyle = isSnakeSelected ? Color.SNAKE_HEAD_TEXT_SELECTED :
                                            Color.SNAKE_HEAD_TEXT;
-    this.ctx.font = '22px "IBM Plex Mono"';
+    this.ctx.font = '23px "VT323"';
     this.ctx.fillText(
         (snakeIndex + 1).toString(),
-        x * (BLOCK_SIZE + 1) + 1 + PADDING,
+        x * (BLOCK_SIZE + 1) + 2 + PADDING,
         (y + 1) * (BLOCK_SIZE + 1) + 1 - PADDING,
     );
   }
 
-  drawFood() {
+  private drawFood() {
     this.ctx.beginPath();
     this.ctx.fillStyle = Color.FOOD;
     this.board.food.forEach((item) => {
-      this.ctx.fillRect(
-          item.x * (BLOCK_SIZE + 1) + 1, item.y * (BLOCK_SIZE + 1) + 1,
-          BLOCK_SIZE, BLOCK_SIZE);
+      const centerX = item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2;
+      const centerY = item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2;
+      this.ctx.arc(centerX, centerY, BLOCK_SIZE / 2, 0, 2 * Math.PI, false);
+      this.ctx.fill();
+      this.ctx.closePath();
     });
   }
 
-  drawGrid() {
-    this.ctx.beginPath();
-    this.ctx.strokeStyle = Color.GRID;
-
-    // Vertical lines
-    for (let i = 0; i <= this.board.width; i++) {
-      this.ctx.moveTo(i * (BLOCK_SIZE + 1) + 1, 0);
-      this.ctx.lineTo(
-          i * (BLOCK_SIZE + 1) + 1, (BLOCK_SIZE + 1) * this.board.height + 1);
+  private getGameOverMessage(gameOver: GameOver): string {
+    switch (gameOver) {
+      case GameOver.HIT_SELF:
+        return 'You have hit yourself.';
+      case GameOver.HIT_WALL:
+        return 'You have hit a wall.';
+      default:
+        return 'Maybe you cannot handle this.';
     }
-
-    // Horizontal lines
-    for (let j = 0; j <= this.board.height; j++) {
-      this.ctx.moveTo(0, j * (BLOCK_SIZE + 1) + 1);
-      this.ctx.lineTo(
-          (BLOCK_SIZE + 1) * this.board.width + 1, j * (BLOCK_SIZE + 1) + 1);
-    }
-
-    this.ctx.stroke();
   }
 }

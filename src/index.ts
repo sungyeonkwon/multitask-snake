@@ -1,6 +1,4 @@
-import '../dist/styles.scss';
-
-import {debounce} from 'debounce';
+import './styles/main.scss';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, DEFAULT_GAME_CONFIG, GameConfig, SnakeType} from './constants';
 import {Page} from './game/game';
@@ -12,8 +10,8 @@ enum Selector {
 }
 
 class Index {
-  isDebugMode = this.getDebugMode();
-  canvas = document.querySelector('canvas');
+  private isDebugMode = this.getDebugMode();
+  private canvas = document.querySelector('canvas');
   page = new Page(this.canvas);
   dialog = this.page.dialog;
 
@@ -30,7 +28,6 @@ class Index {
     this.addListeners();
     this.updateSelectedConfig();
     this.enableDebugMode();
-    console.log('debounce', debounce);
   }
 
   private enableDebugMode() {
@@ -64,7 +61,6 @@ class Index {
     this.dialog.countButtons.forEach((button) => {
       if (this.page.board.snakeCount === Number(button.dataset.count)) {
         button.classList.add(`${Selector.SELECTED}`);
-
       } else {
         button.classList.remove(`${Selector.SELECTED}`);
       }
@@ -79,16 +75,61 @@ class Index {
     })
   }
 
-  addShouldRecordListeners() {
-    window.addEventListener('mousedown', () => {
-      this.shouldRecord = true;
-      document.body.style.cursor = 'crosshair';
-    });
+  mouseDownListener = (event: MouseEvent) => {
+    if ((event.target as HTMLElement).tagName !== 'CANVAS') return;
+    this.shouldRecord = true;
+    document.body.style.cursor = 'crosshair';
 
-    window.addEventListener('mouseup', () => {
-      this.shouldRecord = false;
-      document.body.style.cursor = 'default';
-    });
+    // only if the rendering isn't on
+    if (!this.page.isGamePlaying) {
+      this.page.render(true);
+    }
+  };
+
+  mouseUpListener = (event: MouseEvent) => {
+    if ((event.target as HTMLElement).tagName !== 'CANVAS') return;
+    this.shouldRecord = false;
+    document.body.style.cursor = 'default';
+
+    // only if the rendering isn't on
+    if (!this.page.isGamePlaying) {
+      cancelAnimationFrame(this.page.intervalId.value);
+    }
+  };
+
+  pencilMouseMoveListener = (event: MouseEvent) => {
+    if (!this.shouldRecord) return;
+    const [normalisedX, normalisedY] = this.getNormalisedXY(event);
+    this.page.board.setWalls(normalisedX, normalisedY);
+  };
+
+  eraserMouseMoveListener = (event: MouseEvent) => {
+    if (!this.shouldRecord) return;
+    const [normalisedX, normalisedY] = this.getNormalisedXY(event);
+    this.page.board.removeWalls(normalisedX, normalisedY);
+  };
+
+  addShouldRecordListeners() {
+    window.addEventListener('mousedown', this.mouseDownListener);
+    window.addEventListener('mouseup', this.mouseUpListener);
+  }
+
+  removeMouseUpDownListners() {
+    window.removeEventListener('mousedown', this.mouseDownListener);
+    window.removeEventListener('mouseup', this.mouseUpListener);
+    window.removeEventListener('mousemove', this.pencilMouseMoveListener);
+    window.removeEventListener('mousemove', this.eraserMouseMoveListener);
+  }
+
+  getNormalisedXY(event: MouseEvent): number[] {
+    const {pageX, pageY} = event;
+    const {left, top} = this.canvas.getBoundingClientRect();
+    const l = pageX - left;
+    const r = pageY - top;
+
+    const normalisedX = Math.floor(l / (BLOCK_SIZE + 1));
+    const normalisedY = Math.floor(r / (BLOCK_SIZE + 1));
+    return [normalisedX, normalisedY]
   }
 
   addListeners() {
@@ -110,61 +151,84 @@ class Index {
       });
     });
 
-    this.dialog.startButton.addEventListener('click', () => {
+    this.dialog.startButton.addEventListener('click', (event) => {
+      (event.target as HTMLButtonElement).classList.add('selected');
       this.page.startGame();
-      this.dialog.setDialogState(DialogState.HIDDEN);
+      setTimeout(() => {
+        this.dialog.setDialogState(DialogState.HIDDEN);
+      }, 200);
     });
 
-    this.pauseButton.addEventListener('click', () => {
+    this.restartButton.addEventListener('click', (event) => {
+      // TODO: disable all buttons except sound and restart
+      [...document.querySelectorAll('button')].forEach((button) => {
+        console.log('button', button);
+      });
+
+      (event.target as HTMLButtonElement).classList.add('selected');
+      this.dialog.startButton.classList.remove('selected');
+      this.pencilButton.classList.remove('selected');
+      this.eraserButton.classList.remove('selected');
+
+      setTimeout(() => {
+        this.restartButton.classList.remove('selected');
+        this.page.board.resetBoard();
+        this.page.dialog.setDialogState(DialogState.GAME_CONFIG);
+      }, 200);
+    });
+
+    this.pauseButton.addEventListener('click', (event) => {
       const isPausing = this.pauseButton.innerText === 'Pause';
       this.page.pauseGame(isPausing);
-      this.flipPauseButtons(isPausing);
+      this.flipPauseButtons(isPausing, event.target as HTMLButtonElement);
     });
 
-    this.pencilButton.addEventListener('click', () => {
+    this.pencilButton.addEventListener('click', (event) => {
+      this.removeMouseUpDownListners();
+
+      (event.target as HTMLButtonElement).classList.toggle('selected');
+      if (this.eraserButton.classList.contains('selected')) {
+        this.eraserButton.classList.remove('selected');
+      }
+      this.addShouldRecordListeners();
+      // Add throttle
+      window.addEventListener('mousemove', this.pencilMouseMoveListener);
+    });
+
+    this.eraserButton.addEventListener('click', (event) => {
+      this.removeMouseUpDownListners();
+
+      (event.target as HTMLButtonElement).classList.toggle('selected');
+      if (this.pencilButton.classList.contains('selected')) {
+        this.pencilButton.classList.remove('selected');
+      }
       this.addShouldRecordListeners();
 
       // Add throttle
-      window.addEventListener('mousemove', (event: MouseEvent) => {
-        if (!this.shouldRecord) return;
-
-        const {pageX, pageY} = event;
-        const {left, top} = this.canvas.getBoundingClientRect();
-        const l = pageX - left;
-        const r = pageY - top;
-
-        const normalisedX = Math.floor(l / (BLOCK_SIZE + 1));
-        const normalisedY = Math.floor(r / (BLOCK_SIZE + 1));
-        this.page.board.setWalls(normalisedX, normalisedY);
-      }, false);
-    });
-
-    this.eraserButton.addEventListener('click', () => {
-      this.addShouldRecordListeners();
-
-      // Add throttle
-      window.addEventListener('mousemove', (event: MouseEvent) => {
-        if (!this.shouldRecord) return;
-
-        const {pageX, pageY} = event;
-        const {left, top} = this.canvas.getBoundingClientRect();
-        const l = pageX - left;
-        const r = pageY - top;
-
-        const normalisedX = Math.floor(l / (BLOCK_SIZE + 1));
-        const normalisedY = Math.floor(r / (BLOCK_SIZE + 1));
-        this.page.board.removeWalls(normalisedX, normalisedY);
-      }, false);
+      window.addEventListener('mousemove', this.eraserMouseMoveListener);
     });
 
     window.addEventListener('keydown', (event) => this.page.onKeyDown(event));
   }
 
-  private flipPauseButtons(isPausing = true) {
+  private flipPauseButtons(isPausing = true, button: HTMLButtonElement) {
     const text = isPausing ? 'Resume' : 'Pause';
-    this.pauseButton.innerText = text;
-    this.pauseButton.classList.toggle('pause');
-    this.pauseButton.classList.toggle('resume');
+    button.classList.add('selected');
+
+    setTimeout(() => {
+      this.pauseButton.innerText = text;
+      this.pauseButton.classList.toggle('pause');
+      this.pauseButton.classList.toggle('resume');
+
+      if (!isPausing) {
+        this.pencilButton.classList.remove('selected');
+        this.eraserButton.classList.remove('selected');
+      }
+
+      setTimeout(() => {
+        button.classList.remove('selected');
+      }, 100);
+    }, 200);
   }
 }
 
