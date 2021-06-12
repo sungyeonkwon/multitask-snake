@@ -231,17 +231,17 @@ export class Page {
 
       const r = BLOCK_SIZE / 2;
       const MIN_R = 3;
-      const pos_slope = (r - MIN_R) * 2 / INTERVAL;
-      const y_ntercept = pos_slope * INTERVAL / 2 + r;
+      const posSlope = (r - MIN_R) * 2 / INTERVAL;
+      const yIntercept = posSlope * INTERVAL / 2 + r;
 
       const firstHalf = frame <= INTERVAL / 2;
 
-      const r1 = firstHalf ? pos_slope * frame + MIN_R :
-                             -pos_slope * frame + y_ntercept;
+      const r1 =
+          firstHalf ? posSlope * frame + MIN_R : -posSlope * frame + yIntercept;
       this.drawFoodPiece(centerX, centerY, r1, 0.3);
 
-      const r2 = firstHalf ? -pos_slope * frame + y_ntercept :
-                             pos_slope * frame + MIN_R;
+      const r2 =
+          firstHalf ? -posSlope * frame + yIntercept : posSlope * frame + MIN_R;
       this.drawFoodPiece(centerX, centerY, r2, 0.1);
 
       // Static food layer
