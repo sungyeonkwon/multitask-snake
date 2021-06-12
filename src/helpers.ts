@@ -7,7 +7,6 @@ export function getStartingCoords(snakeCount: number, index: number) {
   };
 }
 
-// TODO: exclude array of coords
 export function getRandomCoords(
     bounds: Coords, excludeArray: Coords[]): Coords {
   let randomCoords = {
@@ -58,7 +57,7 @@ export const requestInterval = function(fn: any, delay: number, fn2: any) {
   const handle = {value: 0};
 
   function loop() {
-    console.log('loop');
+    console.log('[DEV] loop');
     handle.value = window.requestAnimationFrame(loop);
     const current = new Date().getTime();
     const delta = current - start;
@@ -69,7 +68,6 @@ export const requestInterval = function(fn: any, delay: number, fn2: any) {
       start = new Date().getTime();
     }
   }
-  console.log('req interval');
   handle.value = window.requestAnimationFrame(loop);
 
   return handle;

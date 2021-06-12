@@ -52,9 +52,8 @@ export class Page {
       const coords = getStartingCoords(this.board.snakeCount, i);
       snakes.push(new Snake(coords));
 
-
-      // TODO: exclude snakes and walls
-      const newFood = getRandomCoords(this.board.bounds, []);
+      const newFood = getRandomCoords(
+          this.board.bounds, this.board.getSnakeAndWallCoords());
       food.push(newFood);
     }
 

@@ -98,6 +98,13 @@ export class Board {
     }
   }
 
+  getSnakeAndWallCoords(): Coords[] {
+    return [
+      ...this.wall,
+      ...(this.snakes ? this.snakes.flatMap(snake => snake.sequence) : []),
+    ];
+  }
+
   tick(): boolean {
     for (let i = 0; i < this.snakes.length; i++) {
       const snake = this.snakes[i];
@@ -109,8 +116,8 @@ export class Board {
       if (foodIndex >= 0) {
         snake.grow();
         this.food.splice(foodIndex, 1);
-        // TODO: exclude snakes and walls
-        this.food.push(getRandomCoords(this.bounds, []));
+        this.food.push(
+            getRandomCoords(this.bounds, this.getSnakeAndWallCoords()));
         return true;
       }
     }

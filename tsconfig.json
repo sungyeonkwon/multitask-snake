@@ -5,8 +5,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "noImplicitAny": true,
-    // "module": "es6",
-    "target": "ES2017",
+    "target": "ESNext",
     "jsx": "react",
     "allowJs": true,
     "paths": {

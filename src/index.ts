@@ -33,7 +33,7 @@ class Index {
   private enableDebugMode() {
     if (!this.isDebugMode) return;
 
-    console.log('enableDebugMode');
+    console.log('[DEV] enableDebugMode');
     const gridRow = document.createElement('div');
     gridRow.classList.add('debug');
 
