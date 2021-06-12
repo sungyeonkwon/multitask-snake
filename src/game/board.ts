@@ -45,6 +45,7 @@ export class Board {
 
   resetBoard() {
     this.wall = [];
+    this.selectedSnake = 0;
     this.deathReason$.next(null);
   }
 
