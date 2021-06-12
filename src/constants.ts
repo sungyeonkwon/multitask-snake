@@ -6,7 +6,8 @@ export const INTERVAL = 400;
 
 export enum GameOver {
   HIT_SELF = 1,
-  HIT_WALL = 2,
+  HIT_WALL,
+  HIT_ENEMY,
 }
 
 export enum SnakeType {
@@ -19,7 +20,7 @@ export enum SnakeType {
 }
 
 export const DEFAULT_GAME_CONFIG: GameConfig = {
-  snakeType: SnakeType.VIPER,
+  snakeType: SnakeType.MAMBA,
   snakeCount: 2,
 }
 
@@ -28,19 +29,29 @@ export interface GameConfig {
   snakeCount: number;
 }
 
-export const SNAKES = [
+interface SnakeConfig {
+  type: SnakeType;
+  pattern: string[];
+  description: string;
+}
+
+export const ENEMY_SNAKE_PATTERN = ['red'];
+
+export const SNAKES: SnakeConfig[] = [
+  {
+    type: SnakeType.MAMBA,
+    pattern: [
+      'green',
+    ],
+    description: 'Comes with the most basic environment.',
+  },
   {
     type: SnakeType.VIPER,
     pattern: [
       'blue',
       'grey',
-    ]
-  },
-  {
-    type: SnakeType.MAMBA,
-    pattern: [
-      'green',
-    ]
+    ],
+    description: 'Beware: Enemy snake is present.',
   },
   {
     type: SnakeType.DISPHOLIDUS,
@@ -48,21 +59,24 @@ export const SNAKES = [
       'red',
       'blue',
       'red',
-    ]
+    ],
+    description: '(Coming) Eat red food, all snakes to be under one control.',
   },
   {
     type: SnakeType.ANACONDA,
     pattern: [
       'yellow',
       'grey',
-    ]
+    ],
+    description: '(Coming) With abundance of food, snakes will grow faster.',
   },
   {
     type: SnakeType.PYTHON,
     pattern: [
       'grey',
       'darkgrey',
-    ]
+    ],
+    description: '(Environment TBC)',
   },
   {
     type: SnakeType.ANILIUS,
@@ -71,7 +85,8 @@ export const SNAKES = [
       'blue',
       'orange',
       'pink',
-    ]
+    ],
+    description: '(Environment TBC)',
   },
 ];
 
@@ -87,10 +102,10 @@ export enum Color {
 }
 
 export enum Direction {
-  UP = 1,
-  DOWN,
-  LEFT,
-  RIGHT,
+  UP = 'up',
+  DOWN = 'down',
+  LEFT = 'left',
+  RIGHT = 'right',
 }
 
 export interface Coords {

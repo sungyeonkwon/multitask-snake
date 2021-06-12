@@ -1,28 +1,30 @@
 import {ReplaySubject} from 'rxjs';
 import {container, inject} from 'tsyringe';
 
-import {Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType} from '../constants';
+import {BOARD_WIDTH, Coords, DEFAULT_GAME_CONFIG, Direction, GameOver, SnakeType} from '../constants';
 import {getRandomCoords, getRandomEatSound} from '../helpers';
 import {AudioService, Sound} from '../service/audio';
+import {FoodService} from '../service/food';
+import {Enemy} from './enemy';
 
 import {Snake} from './snake';
 
 export class Board {
+  private _snakeCount = DEFAULT_GAME_CONFIG.snakeCount;
+  private _snakeType = DEFAULT_GAME_CONFIG.snakeType;
   snakes?: Snake[];
   bounds: Coords;
   selectedSnake = 0;
-  food: Coords[] = [];
   wall: Coords[] = [];
-  foodInfo: HTMLElement = document.querySelector('.food');
   wallInfo: HTMLElement = document.querySelector('.wall');
-  private _snakeCount = DEFAULT_GAME_CONFIG.snakeCount;
-  private _snakeType = DEFAULT_GAME_CONFIG.snakeType;
   deathReason$ = new ReplaySubject<GameOver|null>(1);
+  enemySnake?: Enemy|null;
 
   constructor(
       width: number,
       height: number,
       @inject('audioService') readonly audioService?: AudioService,
+      @inject('foodService') readonly foodService?: FoodService,
   ) {
     this.bounds = {x: width, y: height};
   }
@@ -55,8 +57,9 @@ export class Board {
     this.wall = [];
     this.selectedSnake = 0;
     this.deathReason$.next(null);
-    this.foodInfo.innerText = '0';
+    this.enemySnake = null;
     this.wallInfo.innerText = '0';
+    container.resolve(FoodService).reset();
   }
 
   canProceed(): boolean {
@@ -64,6 +67,7 @@ export class Board {
       const snake = this.snakes[i];
       const hitWall = this.bumpToWall(snake.newHead);
       const hitSelf = this.bumpToSnake(snake.newHead);
+      const hitEnemy = this.bumpToEnemy(snake.newHead);
       if (hitWall) {
         container.resolve(AudioService).play(Sound.HIT);
         this.deathReason$.next(GameOver.HIT_WALL);
@@ -72,24 +76,13 @@ export class Board {
         container.resolve(AudioService).play(Sound.HIT);
         this.deathReason$.next(GameOver.HIT_SELF);
         return false;
+      } else if (hitEnemy) {
+        container.resolve(AudioService).play(Sound.HIT);
+        this.deathReason$.next(GameOver.HIT_ENEMY);
+        return false;
       }
     }
     return true;
-  }
-
-  private bumpToSnake(newHead: Coords): boolean {
-    return this.snakes.some(snake => {
-      return snake.sequence.some(
-          segment => segment.x === newHead.x && segment.y === newHead.y);
-    })
-  }
-
-  private bumpToWall(newHead: Coords): boolean {
-    const bumpedToEdges = newHead.x < 0 || newHead.y < 0 ||
-        newHead.x >= this.bounds.x || newHead.y >= this.bounds.y;
-    const bumpedToCustomWalls =
-        this.wall.find(({x, y}) => x === newHead.x && y === newHead.y);
-    return bumpedToEdges || !!bumpedToCustomWalls;
   }
 
   setWalls(x: number, y: number) {
@@ -113,33 +106,74 @@ export class Board {
     }
   }
 
+  /** Gets all coords that one snake should not collide into. */
   getSnakeAndWallCoords(): Coords[] {
     return [
       ...this.wall,
       ...(this.snakes ? this.snakes.flatMap(snake => snake.sequence) : []),
+      ...(this.enemySnake ? this.enemySnake.sequence : []),
     ];
   }
 
   tick(): boolean {
+    let hasEaten = false;
     for (let i = 0; i < this.snakes.length; i++) {
       const snake = this.snakes[i];
       snake.step();
-
-      // TODO: Temporary fix for the frame missing the new head position
-      const foodIndex = this.food.findIndex(
-          (item) => {return (item.x === snake.sequence[0].x &&
-                             item.y === snake.sequence[0].y) ||
-                     (item.x === snake.sequence[1].x &&
-                      item.y === snake.sequence[1].y)});
+      const foodIndex = this.getEatenFoodIndex(snake);
       if (foodIndex >= 0) {
-        snake.grow();
-        container.resolve(AudioService).play(getRandomEatSound());
-        this.food.splice(foodIndex, 1);
-        this.food.push(
-            getRandomCoords(this.bounds, this.getSnakeAndWallCoords()));
-        return true;
+        hasEaten = true;
+        this.consumeFood(foodIndex, snake);
       }
     }
-    return false;
+
+    if (this.enemySnake) {
+      this.enemySnake.step();
+      const enemyEatenfoodIndex = this.getEatenFoodIndex(this.enemySnake);
+      if (enemyEatenfoodIndex >= 0) {
+        this.consumeFood(enemyEatenfoodIndex, this.enemySnake);
+      }
+    }
+
+    return hasEaten;
+  }
+
+  private consumeFood(foodIndex: number, snake: Snake) {
+    snake.grow();
+    container.resolve(AudioService).play(getRandomEatSound());
+    container.resolve(FoodService).food.splice(foodIndex, 1);
+    container.resolve(FoodService)
+        .food.push(getRandomCoords(this.bounds, this.getSnakeAndWallCoords()));
+  }
+
+  private getEatenFoodIndex(snake: Snake) {
+    // TODO: Temporary fix for the frame missing the new head position
+    return container.resolve(FoodService)
+        .food.findIndex(
+            (item) => {return (item.x === snake.sequence[0].x &&
+                               item.y === snake.sequence[0].y) ||
+                       (item.x === snake.sequence[1].x &&
+                        item.y === snake.sequence[1].y)});
+  }
+
+  private bumpToEnemy(newHead: Coords): boolean {
+    return this.enemySnake &&
+        this.enemySnake.sequence.some(
+            segment => segment.x === newHead.x && segment.y === newHead.y);
+  }
+
+  private bumpToSnake(newHead: Coords): boolean {
+    return this.snakes.some(snake => {
+      return snake.sequence.some(
+          segment => segment.x === newHead.x && segment.y === newHead.y);
+    })
+  }
+
+  private bumpToWall(newHead: Coords): boolean {
+    const bumpedToEdges = newHead.x < 0 || newHead.y < 0 ||
+        newHead.x >= this.bounds.x || newHead.y >= this.bounds.y;
+    const bumpedToCustomWalls =
+        this.wall.find(({x, y}) => x === newHead.x && y === newHead.y);
+    return bumpedToEdges || !!bumpedToCustomWalls;
   }
 }

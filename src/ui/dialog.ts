@@ -68,10 +68,11 @@ export class Dialog {
                               p[index]}"></span>`)
                       .join('');
               return `<button class="type" data-type="${snake.type}">
+              <h5 class="name">${snake.type}</h5>
               <div class="body">
                 ${sections}
               </div>
-              <h5 class="name">${snake.type}</h5>
+              <p class="description">${snake.description}</p>
             </button>`
             })
             .join('')}

@@ -3,18 +3,11 @@ import {getNextCoords, isDirectionOpposite} from '../helpers';
 
 export class Snake {
   sequence: Coords[] = [];
-  direction = Direction.RIGHT;
+  direction: Direction;
 
-  constructor(start: Coords) {
-    let count = INIT_SNAKE_SIZE;
-    this.sequence.push(start);
-
-    while (count > 0) {
-      const next = getNextCoords(
-          this.sequence[this.sequence.length - 1], Direction.LEFT);
-      this.sequence.push(next);
-      count--;
-    }
+  constructor(start: Coords, direction: Direction) {
+    this.direction = direction;
+    this.makeBody(start);
   }
 
   get head(): Coords {
@@ -39,5 +32,19 @@ export class Snake {
   step() {
     this.sequence.pop();
     this.sequence.unshift(this.newHead);
+  }
+
+  makeBody(start: Coords) {
+    let count = INIT_SNAKE_SIZE;
+    this.sequence.push(start);
+
+    const buildingDirection =
+        this.direction === Direction.RIGHT ? Direction.LEFT : Direction.RIGHT;
+    while (count > 0) {
+      const next = getNextCoords(
+          this.sequence[this.sequence.length - 1], buildingDirection);
+      this.sequence.push(next);
+      count--;
+    }
   }
 }

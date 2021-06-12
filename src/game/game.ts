@@ -1,16 +1,18 @@
-import {container} from 'tsyringe';
+import {container, inject} from 'tsyringe';
 
-import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, directionKeyMap, GameOver, selectedSnakeKeyMap} from '../constants';
+import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, Direction, directionKeyMap, ENEMY_SNAKE_PATTERN, GameOver, selectedSnakeKeyMap, SnakeType} from '../constants';
 import {Coords, INTERVAL, SNAKES} from '../constants';
 import {getFullPattern, getRandomCoords, getStartingCoords, requestInterval} from '../helpers';
 import {AudioService, Sound} from '../service/audio';
+import {FoodService} from '../service/food';
 import {Dialog, DialogState} from '../ui/dialog';
 
 import {Board} from './board';
+import {Enemy} from './enemy';
 import {Snake} from './snake';
 
 export class Page {
-  intervalId: any;  // fix
+  intervalId: any;
   board: Board;
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -20,7 +22,10 @@ export class Page {
   gameOverContainer: HTMLElement = document.querySelector('.gameover');
   isGamePlaying = false;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(
+      canvas: HTMLCanvasElement,
+      @inject('foodService') readonly foodService?: FoodService,
+  ) {
     this.board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
     this.canvas = canvas;
     this.ctx = this.canvas.getContext('2d');
@@ -44,21 +49,22 @@ export class Page {
   startGame() {
     this.board.resetBoard();
 
+    if (this.board.snakeType === SnakeType.VIPER) {
+      this.activateEnemySnake();
+    }
+
     // populate snakes
     const snakes: Snake[] = [];
-    const food: Coords[] = [];
     for (let i = 0; i < this.board.snakeCount; i++) {
       const coords = getStartingCoords(this.board.snakeCount, i);
-      snakes.push(new Snake(coords));
+      snakes.push(new Snake(coords, Direction.RIGHT));
 
       const newFood = getRandomCoords(
           this.board.bounds, this.board.getSnakeAndWallCoords());
-      food.push(newFood);
+      container.resolve(FoodService).addFood(newFood);
     }
 
     this.board.snakes = snakes;
-    this.board.food = food;
-
     this.render();
     this.isGamePlaying = true;
   }
@@ -102,7 +108,8 @@ export class Page {
           const hasEaten = this.board.tick();
           if (hasEaten) {
             this.eatCount++;
-            this.board.foodInfo.innerText = this.eatCount.toString();
+            container.resolve(FoodService).foodInfo.innerText =
+                this.eatCount.toString();
           }
         },
         INTERVAL,
@@ -110,6 +117,12 @@ export class Page {
           this.drawAll(this.intervalId.delta);
         });
   };
+
+  private activateEnemySnake() {
+    const enemyStartingCoords = {x: BOARD_WIDTH / 2, y: 0};
+    this.board.enemySnake =
+        new Enemy(enemyStartingCoords, Direction.LEFT, this.board.bounds);
+  }
 
   private drawAll(frame: number) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -119,6 +132,9 @@ export class Page {
     this.board.snakes.forEach((snake, snakeIndex) => {
       this.drawSnake(snake, snakeIndex);
     });
+    if (this.board.enemySnake) {
+      this.drawSnake(this.board.enemySnake, null, true);
+    }
     this.board.wallInfo.innerText = this.board.wall.length.toString();
   }
 
@@ -181,14 +197,17 @@ export class Page {
   }
 
   // to make it smooth, it just needs to be granular and not fixed by block.
-  private drawSnake(snake: Snake, snakeIndex: number) {
+  private drawSnake(
+      snake: Snake, snakeIndex: number|null, isEnemySnake = false) {
     const {x, y} = snake.head;
     const PADDING = 4;
     const isSnakeSelected = snakeIndex === this.board.selectedSnake;
 
     // Fill body
     const pattern = SNAKES.find(s => s.type === this.board.snakeType).pattern;
-    const fullPattern = getFullPattern(pattern, snake.sequence.length)
+    const fullPattern = isEnemySnake ?
+        ENEMY_SNAKE_PATTERN :
+        getFullPattern(pattern, snake.sequence.length);  // Enemy snake pattern
     snake.sequence.forEach((coords, index) => {
       this.ctx.fillStyle = fullPattern[index];
       this.ctx.fillRect(
@@ -203,6 +222,7 @@ export class Page {
         x * (BLOCK_SIZE + 1) + 1, y * (BLOCK_SIZE + 1) + 1, BLOCK_SIZE,
         BLOCK_SIZE);
 
+    if (isEnemySnake) return;
     // Fill number
     this.ctx.fillStyle = isSnakeSelected ? Color.SNAKE_HEAD_TEXT_SELECTED :
                                            Color.SNAKE_HEAD_TEXT;
@@ -224,7 +244,7 @@ export class Page {
   }
 
   private drawFood(frame: number) {
-    this.board.food.forEach((item) => {
+    container.resolve(FoodService).food.forEach((item) => {
       const centerX = item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2;
       const centerY = item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2;
 
@@ -254,6 +274,8 @@ export class Page {
         return 'You have hit yourself.';
       case GameOver.HIT_WALL:
         return 'You have hit a wall.';
+      case GameOver.HIT_ENEMY:
+        return 'Enemy snake killed you.';
       default:
         return 'Maybe you cannot handle this.';
     }

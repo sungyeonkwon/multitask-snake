@@ -10,17 +10,15 @@ https://multitasking-snake.xyz/
 
 - [x] Make food shine
 - [x] Add sound on/off button
-- [ ] Add sound effect for drawing
+- [x] Version: enemy snake
+- [ ] disable wall feature if the type is enemy
+- [ ] Make enemy snake do u-turn
+- [ ] Add sound effect for drawing / enemy eating food
 - [ ] Add acceleration
-- [ ] Version: enemy snake
 - [ ] Version: multi control mode with red food
 - [ ] Version: x3 more food opportunities
 - [ ] Themed grid/background
-
-### Fix
-
-- [x] Future head issue raised
-- [x] File copy config on webpack
+- [ ] Enable wall / BFS movement for enemy snake
 
 ### General
 
