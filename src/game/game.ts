@@ -89,29 +89,34 @@ export class Page {
 
   render(renderWallOnly = false) {
     // called interval-ly
-    this.intervalId = requestInterval(() => {
-      if (!this.board.canProceed()) {
-        this.stopGame();
-        return;
-      }
+    this.intervalId = requestInterval(
+        () => {
+          if (!this.board.canProceed()) {
+            this.stopGame();
+            return;
+          }
 
-      this.drawAll();
+          this.drawAll(this.intervalId.delta);
 
-      if (renderWallOnly) return;
+          if (renderWallOnly) return;
 
-      const hasEaten = this.board.tick();
-      if (hasEaten) {
-        this.eatCount++;
-        this.foodInfo.innerText = this.eatCount.toString();
-      }
-    }, INTERVAL, () => this.drawAll());
+          const hasEaten = this.board.tick();
+          if (hasEaten) {
+            this.eatCount++;
+            this.foodInfo.innerText = this.eatCount.toString();
+          }
+        },
+        INTERVAL,
+        () => {
+          this.drawAll(this.intervalId.delta);
+        });
   };
 
-  private drawAll() {
+  private drawAll(frame: number) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawGrid();
     this.drawWall();
-    this.drawFood();
+    this.drawFood(frame);
     this.board.snakes.forEach((snake, snakeIndex) => {
       this.drawSnake(snake, snakeIndex);
     });
@@ -210,15 +215,37 @@ export class Page {
     );
   }
 
-  private drawFood() {
+  private drawFoodPiece(
+      centerX: number, centerY: number, r: number, opacity: number) {
     this.ctx.beginPath();
-    this.ctx.fillStyle = Color.FOOD;
+    this.ctx.arc(centerX, centerY, r, 0, 2 * Math.PI, false);
+    this.ctx.fillStyle = `rgba(0, 255, 0, ${opacity})`;
+    this.ctx.fill();
+    this.ctx.closePath();
+  }
+
+  private drawFood(frame: number) {
     this.board.food.forEach((item) => {
       const centerX = item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2;
       const centerY = item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2;
-      this.ctx.arc(centerX, centerY, BLOCK_SIZE / 2, 0, 2 * Math.PI, false);
-      this.ctx.fill();
-      this.ctx.closePath();
+
+      const r = BLOCK_SIZE / 2;
+      const MIN_R = 3;
+      const pos_slope = (r - MIN_R) * 2 / INTERVAL;
+      const y_ntercept = pos_slope * INTERVAL / 2 + r;
+
+      const firstHalf = frame <= INTERVAL / 2;
+
+      const r1 = firstHalf ? pos_slope * frame + MIN_R :
+                             -pos_slope * frame + y_ntercept;
+      this.drawFoodPiece(centerX, centerY, r1, 0.3);
+
+      const r2 = firstHalf ? -pos_slope * frame + y_ntercept :
+                             pos_slope * frame + MIN_R;
+      this.drawFoodPiece(centerX, centerY, r2, 0.1);
+
+      // Static food layer
+      this.drawFoodPiece(centerX, centerY, r * 2 / 3, 0.1);
     });
   }
 

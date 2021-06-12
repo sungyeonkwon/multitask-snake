@@ -83,7 +83,6 @@ export enum Color {
   SNAKE_HEAD_SELECTED = 'red',
   SNAKE_HEAD_TEXT = 'black',
   SNAKE_HEAD_TEXT_SELECTED = 'white',
-  FOOD = 'lightgreen',
   WALL = 'red',
 }
 
