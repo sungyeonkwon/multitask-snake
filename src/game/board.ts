@@ -1,8 +1,8 @@
-import {ReplaySubject} from 'rxjs';
-import {Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType} from '../constants';
-import {getRandomCoords} from '../helpers';
-import {AudioService, Sound} from '../service/audio';
-import {Snake} from './snake';
+import { ReplaySubject } from 'rxjs';
+import { Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType } from '../constants';
+import { getRandomCoords } from '../helpers';
+import { AudioService, Sound } from '../service/audio';
+import { Snake } from './snake';
 
 export class Board {
   snakes?: Snake[];
@@ -12,11 +12,11 @@ export class Board {
   wall: Coords[] = [];
   private _snakeCount = DEFAULT_GAME_CONFIG.snakeCount;
   private _snakeType = DEFAULT_GAME_CONFIG.snakeType;
-  deathReason$ = new ReplaySubject<GameOver|null>(1);
+  deathReason$ = new ReplaySubject<GameOver | null>(1);
   readonly audioService = new AudioService();
 
   constructor(width: number, height: number) {
-    this.bounds = {x: width, y: height};
+    this.bounds = { x: width, y: height };
   }
 
   get width(): number {
@@ -70,23 +70,23 @@ export class Board {
   private bumpToSnake(newHead: Coords): boolean {
     return this.snakes.some(snake => {
       return snake.sequence.some(
-          segment => segment.x === newHead.x && segment.y === newHead.y);
+        segment => segment.x === newHead.x && segment.y === newHead.y);
     })
   }
 
   private bumpToWall(newHead: Coords): boolean {
     const bumpedToEdges = newHead.x < 0 || newHead.y < 0 ||
-        newHead.x >= this.bounds.x || newHead.y >= this.bounds.y;
+      newHead.x >= this.bounds.x || newHead.y >= this.bounds.y;
     const bumpedToCustomWalls =
-        this.wall.find(({x, y}) => x === newHead.x && y === newHead.y);
+      this.wall.find(({ x, y }) => x === newHead.x && y === newHead.y);
     return bumpedToEdges || !!bumpedToCustomWalls;
   }
 
   setWalls(x: number, y: number) {
-    const block: Coords = {x, y};
+    const block: Coords = { x, y };
 
     const isNotAlreadyWall =
-        !this.wall.find((block) => block.x === x && block.y === y);
+      !this.wall.find((block) => block.x === x && block.y === y);
     const isNotPartofSnake = !this.snakes.find(snake => {
       return snake.sequence.find(segment => segment.x === x && segment.y === y);
     });
@@ -97,7 +97,7 @@ export class Board {
 
   removeWalls(x: number, y: number) {
     const index =
-        this.wall.findIndex((block) => block.x === x && block.y === y);
+      this.wall.findIndex((block) => block.x === x && block.y === y);
     if (index >= 0) {
       this.wall.splice(index, 1);
     }
@@ -117,16 +117,22 @@ export class Board {
 
       // TODO: Temporary fix for the frame missing the new head position
       const foodIndex = this.food.findIndex(
-          (item) => {return (item.x === snake.newHead.x &&
-                             item.y === snake.newHead.y) ||
-                     item.x === snake.sequence[1].x &&
-                         item.y === snake.sequence[1].y});
+        (item) => {
+          return (item.x === snake.newHead.x &&
+            item.y === snake.newHead.y) ||
+            item.x === snake.sequence[1].x &&
+            item.y === snake.sequence[1].y
+        });
       if (foodIndex >= 0) {
         snake.grow();
         this.food.splice(foodIndex, 1);
         this.food.push(
-            getRandomCoords(this.bounds, this.getSnakeAndWallCoords()));
-        setTimeout(() => {this.audioService.play(Sound.EAT)}, 300);
+          getRandomCoords(this.bounds, this.getSnakeAndWallCoords()));
+        const eats = [Sound.EAT1, Sound.EAT2, Sound.EAT3, Sound.EAT4, Sound.EAT5];
+        const randomEat = eats[Math.floor(Math.random() * eats.length)];
+        setTimeout(() => {
+          this.audioService.play(randomEat)
+        }, 50);
         return true;
       }
     }

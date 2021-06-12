@@ -1,7 +1,11 @@
-import {Howl, Howler} from 'howler';
+import { Howl, Howler } from 'howler';
 
 export enum Sound {
-  EAT = 'eat',
+  EAT1 = 'eat1',
+  EAT2 = 'eat2',
+  EAT3 = 'eat3',
+  EAT4 = 'eat4',
+  EAT5 = 'eat5',
   GAME_OVER = 'gameover',
   BUTTON = 'button',
   HIT = 'hit',
@@ -9,7 +13,7 @@ export enum Sound {
 }
 
 export class AudioService {
-  readonly sounds: {[key: string]: Howl} = {};
+  readonly sounds: { [key: string]: Howl } = {};
   readonly isLoaded = this.loadFiles(Object.values(Sound));
   isMuted = false;
 
@@ -24,7 +28,7 @@ export class AudioService {
   toggleMute(soundButton: HTMLButtonElement) {
     this.isMuted = !this.isMuted;
     soundButton.innerText =
-        this.isMuted ? 'Sound on / [off]' : 'Sound [on] / off';
+      this.isMuted ? 'Sound on / [off]' : 'Sound [on] / off';
     Howler.mute(this.isMuted);
   }
 
