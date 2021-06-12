@@ -105,7 +105,7 @@ canvas {
   }
 }
 
-.outside-button-container {
+.sound-container {
   position: absolute;
   left: 30px;
   top: 30px;
@@ -126,5 +126,6 @@ canvas {
     margin: 0;
     border: none;
     padding: 0;
+    box-shadow: none;
   }
 }

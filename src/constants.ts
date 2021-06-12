@@ -2,7 +2,7 @@ export const BOARD_WIDTH = 50;
 export const BOARD_HEIGHT = 25;
 export const BLOCK_SIZE = 20;
 export const INIT_SNAKE_SIZE = 5;
-export const INTERVAL = 500;
+export const INTERVAL = 400;
 
 export enum GameOver {
   HIT_SELF = 1,

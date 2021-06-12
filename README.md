@@ -6,5 +6,7 @@ https://multitasking-snake.xyz/
 
 ### Feature to add
 
-- [ ] Add sound on/off button
+- [x] Add sound on/off button
+- [ ] Add sound effect for drawing
 - [ ] Make food shine
+- [ ] Add acceleration

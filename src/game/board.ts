@@ -1,6 +1,7 @@
 import {ReplaySubject} from 'rxjs';
 import {Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType} from '../constants';
 import {getRandomCoords} from '../helpers';
+import {AudioService, Sound} from '../service/audio';
 import {Snake} from './snake';
 
 export class Board {
@@ -12,6 +13,7 @@ export class Board {
   private _snakeCount = DEFAULT_GAME_CONFIG.snakeCount;
   private _snakeType = DEFAULT_GAME_CONFIG.snakeType;
   deathReason$ = new ReplaySubject<GameOver|null>(1);
+  readonly audioService = new AudioService();
 
   constructor(width: number, height: number) {
     this.bounds = {x: width, y: height};
@@ -52,9 +54,11 @@ export class Board {
       const hitWall = this.bumpToWall(snake.newHead);
       const hitSelf = this.bumpToSnake(snake.newHead);
       if (hitWall) {
+        this.audioService.play(Sound.HIT);
         this.deathReason$.next(GameOver.HIT_WALL);
         return false;
       } else if (hitSelf) {
+        this.audioService.play(Sound.HIT);
         this.deathReason$.next(GameOver.HIT_SELF);
         return false;
       }
@@ -112,12 +116,12 @@ export class Board {
 
       const foodIndex = this.food.findIndex(
           (item) => item.x === snake.newHead.x && item.y === snake.newHead.y);
-
       if (foodIndex >= 0) {
         snake.grow();
         this.food.splice(foodIndex, 1);
         this.food.push(
             getRandomCoords(this.bounds, this.getSnakeAndWallCoords()));
+        setTimeout(() => {this.audioService.play(Sound.EAT)}, 300);
         return true;
       }
     }
