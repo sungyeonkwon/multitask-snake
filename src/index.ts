@@ -1,5 +1,8 @@
 import './styles/main.scss';
 
+import {fromEvent, timer} from 'rxjs';
+import {concat, debounce, debounceTime, throttleTime} from 'rxjs/operators';
+
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, DEFAULT_GAME_CONFIG, GameConfig, SnakeType} from './constants';
 import {Page} from './game/game';
 import {DialogState} from './ui/dialog';
@@ -8,6 +11,7 @@ enum Selector {
   COUNT_CONTAINER = 'count-container',
   SELECTED = 'selected',
 }
+
 
 class Index {
   private isDebugMode = this.getDebugMode();
@@ -177,11 +181,13 @@ class Index {
       }, 200);
     });
 
-    this.pauseButton.addEventListener('click', (event) => {
-      const isPausing = this.pauseButton.innerText === 'Pause';
-      this.page.pauseGame(isPausing);
-      this.flipPauseButtons(isPausing, event.target as HTMLButtonElement);
-    });
+    fromEvent(this.pauseButton, 'click')
+        .pipe(throttleTime(200))
+        .subscribe((event) => {
+          const isPausing = this.pauseButton.innerText === 'Pause';
+          this.page.pauseGame(isPausing);
+          this.flipPauseButtons(isPausing, event.target as HTMLButtonElement);
+        });
 
     this.pencilButton.addEventListener('click', (event) => {
       this.removeMouseUpDownListners();
