@@ -114,8 +114,12 @@ export class Board {
       const snake = this.snakes[i];
       snake.step();
 
+      // TODO: Temporary fix for the frame missing the new head position
       const foodIndex = this.food.findIndex(
-          (item) => item.x === snake.newHead.x && item.y === snake.newHead.y);
+          (item) => {return (item.x === snake.newHead.x &&
+                             item.y === snake.newHead.y) ||
+                     item.x === snake.sequence[1].x &&
+                         item.y === snake.sequence[1].y});
       if (foodIndex >= 0) {
         snake.grow();
         this.food.splice(foodIndex, 1);
