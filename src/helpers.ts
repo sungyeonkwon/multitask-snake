@@ -58,7 +58,7 @@ export const requestInterval = function(fn: any, delay: number, fn2: any) {
 
   function loop() {
     handle.value = window.requestAnimationFrame(loop);
-    console.log('[DEV] loop');
+    // console.log('[DEV] loop');
     const current = new Date().getTime();
     const delta = current - start;
     handle.delta = delta;
