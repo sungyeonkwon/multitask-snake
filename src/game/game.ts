@@ -17,8 +17,6 @@ export class Page {
   speed?: number;
   eatCount = 0;
   dialog = new Dialog();
-  foodInfo: HTMLElement = document.querySelector('.food');
-  wallInfo: HTMLElement = document.querySelector('.wall');
   gameOverContainer: HTMLElement = document.querySelector('.gameover');
   isGamePlaying = false;
 
@@ -103,7 +101,7 @@ export class Page {
           const hasEaten = this.board.tick();
           if (hasEaten) {
             this.eatCount++;
-            this.foodInfo.innerText = this.eatCount.toString();
+            this.board.foodInfo.innerText = this.eatCount.toString();
           }
         },
         INTERVAL,
@@ -120,7 +118,7 @@ export class Page {
     this.board.snakes.forEach((snake, snakeIndex) => {
       this.drawSnake(snake, snakeIndex);
     });
-    this.wallInfo.innerText = this.board.wall.length.toString();
+    this.board.wallInfo.innerText = this.board.wall.length.toString();
   }
 
   private drawGrid() {
