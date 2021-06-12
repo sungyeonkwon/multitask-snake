@@ -1,9 +1,9 @@
 import './styles/main.scss';
 
-import {fromEvent, timer} from 'rxjs';
-import {concat, debounce, debounceTime, throttleTime} from 'rxjs/operators';
+import {asyncScheduler, fromEvent, iif, interval, of as observableOf, timer} from 'rxjs';
+import {debounce, debounceTime, filter, map, mergeMap, tap, throttle, throttleTime} from 'rxjs/operators';
 
-import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, DEFAULT_GAME_CONFIG, GameConfig, SnakeType} from './constants';
+import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, directionKeyMap, INTERVAL, selectedSnakeKeyMap, SnakeType} from './constants';
 import {Page} from './game/game';
 import {DialogState} from './ui/dialog';
 
@@ -11,7 +11,6 @@ enum Selector {
   COUNT_CONTAINER = 'count-container',
   SELECTED = 'selected',
 }
-
 
 class Index {
   private isDebugMode = this.getDebugMode();
@@ -214,7 +213,20 @@ class Index {
       window.addEventListener('mousemove', this.eraserMouseMoveListener);
     });
 
-    window.addEventListener('keydown', (event) => this.page.onKeyDown(event));
+    const directionKey$ =
+        fromEvent(window, 'keydown')
+            .pipe(filter(
+                (event: KeyboardEvent) => !!directionKeyMap.get(event.code)));
+    const selectSnakeKey$ = fromEvent(window, 'keydown')
+                                .pipe(filter(
+                                    (event: KeyboardEvent) =>
+                                        !!selectedSnakeKeyMap.get(event.code)));
+    directionKey$
+        .pipe(throttleTime(
+            INTERVAL, asyncScheduler, {leading: true, trailing: true}))
+        .subscribe((event) => this.page.handleDirection(event.code));
+    selectSnakeKey$.subscribe(
+        (event) => this.page.handleSnakeSelection(event.code));
   }
 
   private flipPauseButtons(isPausing = true, button: HTMLButtonElement) {

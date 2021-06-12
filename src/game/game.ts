@@ -1,14 +1,12 @@
 import {take} from 'rxjs/operators';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, directionKeyMap, GameOver, selectedSnakeKeyMap} from '../constants';
-import {Coords, SNAKES} from '../constants';
+import {Coords, INTERVAL, SNAKES} from '../constants';
 import {getFullPattern, getRandomCoords, getStartingCoords, requestInterval} from '../helpers';
 import {Dialog, DialogState} from '../ui/dialog';
 
 import {Board} from './board';
 import {Snake} from './snake';
-
-const INTERVAL = 500;
 
 export class Page {
   intervalId: any;  // fix
@@ -30,19 +28,18 @@ export class Page {
     this.drawGrid();
   }
 
-  // Add throttle
-  onKeyDown = (event: KeyboardEvent) => {
-    const direction = directionKeyMap.get(event.code);
-    if (direction) {
-      const snake = this.board.snakes.find(
-          (_, index) => index === this.board.selectedSnake);
-      snake.setDirection(direction);
-    } else {
-      const index = selectedSnakeKeyMap.get(event.code);
-      if (index && index <= this.board.snakes.length) {
-        this.board.selectedSnake = index - 1;
-      };
-    }
+  handleDirection(keycode: string) {
+    const direction = directionKeyMap.get(keycode);
+    const snake = this.board.snakes.find(
+        (_, index) => index === this.board.selectedSnake);
+    snake.setDirection(direction);
+  }
+
+  handleSnakeSelection(keycode: string) {
+    const index = selectedSnakeKeyMap.get(keycode);
+    if (index && index <= this.board.snakes.length) {
+      this.board.selectedSnake = index - 1;
+    };
   };
 
   startGame() {
