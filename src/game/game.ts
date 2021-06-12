@@ -37,9 +37,12 @@ export class Page {
       const snake = this.board.snakes.find(
           (_, index) => index === this.board.selectedSnake);
       snake.setDirection(direction);
+    } else {
+      const index = selectedSnakeKeyMap.get(event.code);
+      if (index && index <= this.board.snakes.length) {
+        this.board.selectedSnake = index - 1;
+      };
     }
-    const index = selectedSnakeKeyMap.get(event.code);
-    if (index) this.board.selectedSnake = index - 1;
   };
 
   startGame() {
