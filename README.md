@@ -20,7 +20,7 @@ https://multitasking-snake.xyz/
 ### Fix
 
 - [x] Future head issue raised
-- [ ] File copy config on webpack
+- [x] File copy config on webpack
 
 ### General
 

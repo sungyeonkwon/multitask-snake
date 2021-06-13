@@ -35,6 +35,11 @@ module.exports = {
           to: path.resolve(__dirname, 'dist/assets'),
           force: true,
         },
+        {
+          from: path.resolve(__dirname, 'src/index.html'),
+          to: path.resolve(__dirname, 'dist/index.html'),
+          toType: 'file',
+        },
       ],
     }),
     new MiniCssExtractPlugin({
