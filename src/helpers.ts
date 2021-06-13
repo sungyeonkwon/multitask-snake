@@ -1,4 +1,5 @@
 import {BOARD_HEIGHT, BOARD_WIDTH, Coords, Direction} from './constants';
+import {Sound} from './service/audio';
 
 export function getStartingCoords(snakeCount: number, index: number) {
   return {
@@ -80,4 +81,9 @@ export function getFullPattern(pattern: string[], limit: number): string[] {
     fullPattern.push(pattern[i % pattern.length]);
   }
   return fullPattern;
+}
+
+export function getRandomEatSound() {
+  const eats = Object.values(Sound).filter(sound => sound.includes('eat'));
+  return eats[Math.floor(Math.random() * eats.length)];
 }

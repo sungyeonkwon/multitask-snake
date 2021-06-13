@@ -1,7 +1,9 @@
 import {ReplaySubject} from 'rxjs';
+
 import {Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType} from '../constants';
-import {getRandomCoords} from '../helpers';
+import {getRandomCoords, getRandomEatSound} from '../helpers';
 import {AudioService, Sound} from '../service/audio';
+
 import {Snake} from './snake';
 
 export class Board {
@@ -121,19 +123,16 @@ export class Board {
 
       // TODO: Temporary fix for the frame missing the new head position
       const foodIndex = this.food.findIndex(
-          (item) => {return (item.x === snake.newHead.x &&
-                             item.y === snake.newHead.y) ||
-                     item.x === snake.sequence[1].x &&
-                         item.y === snake.sequence[1].y});
+          (item) => {return (item.x === snake.sequence[0].x &&
+                             item.y === snake.sequence[0].y) ||
+                     (item.x === snake.sequence[1].x &&
+                      item.y === snake.sequence[1].y)});
       if (foodIndex >= 0) {
         snake.grow();
+        this.audioService.play(getRandomEatSound());
         this.food.splice(foodIndex, 1);
         this.food.push(
             getRandomCoords(this.bounds, this.getSnakeAndWallCoords()));
-        const eats =
-            [Sound.EAT1, Sound.EAT2, Sound.EAT3, Sound.EAT4, Sound.EAT5];
-        const randomEat = eats[Math.floor(Math.random() * eats.length)];
-        setTimeout(() => {this.audioService.play(randomEat)}, 50);
         return true;
       }
     }
