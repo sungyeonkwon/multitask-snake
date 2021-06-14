@@ -1,9 +1,9 @@
-import {take} from 'rxjs/operators';
+import {container} from 'tsyringe';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, directionKeyMap, GameOver, selectedSnakeKeyMap} from '../constants';
 import {Coords, INTERVAL, SNAKES} from '../constants';
 import {getFullPattern, getRandomCoords, getStartingCoords, requestInterval} from '../helpers';
-import {Sound} from '../service/audio';
+import {AudioService, Sound} from '../service/audio';
 import {Dialog, DialogState} from '../ui/dialog';
 
 import {Board} from './board';
@@ -72,7 +72,8 @@ export class Page {
           DialogState.GAME_OVER, this.getGameOverMessage(reason));
     });
 
-    setTimeout(() => this.board.audioService.play(Sound.GAME_OVER), 700);
+    setTimeout(
+        () => container.resolve(AudioService).play(Sound.GAME_OVER), 700);
     // TODO: disable wall / pause
   }
 

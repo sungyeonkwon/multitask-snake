@@ -8,6 +8,8 @@
     "target": "ESNext",
     "jsx": "react",
     "allowJs": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
       "rxjs": [
         "./node_modules/rxjs"

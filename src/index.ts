@@ -1,11 +1,13 @@
 import './styles/main.scss';
+import 'reflect-metadata';
 
-import {asyncScheduler, fromEvent, iif, interval, of as observableOf, timer} from 'rxjs';
-import {debounce, debounceTime, filter, map, mergeMap, tap, throttle, throttleTime} from 'rxjs/operators';
+import {asyncScheduler, fromEvent} from 'rxjs';
+import {filter, tap, throttleTime} from 'rxjs/operators';
+import {container, inject} from 'tsyringe';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, directionKeyMap, INTERVAL, selectedSnakeKeyMap, SnakeType} from './constants';
 import {Page} from './game/game';
-import {Sound} from './service/audio';
+import {AudioService, Sound} from './service/audio';
 import {DialogState} from './ui/dialog';
 
 enum Selector {
@@ -139,14 +141,14 @@ class Index {
 
   addListeners() {
     fromEvent(this.soundButton, 'click').subscribe((event) => {
-      this.page.board.audioService.toggleMute(
-          event.target as HTMLButtonElement);
+      container.resolve(AudioService)
+          .toggleMute(event.target as HTMLButtonElement);
     });
 
     // snake count listener
     this.dialog.countButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        this.page.board.audioService.play(Sound.BUTTON);
+        container.resolve(AudioService).play(Sound.BUTTON);
         this.page.board.setSnakeCount(Number(button.dataset.count));
 
         this.updateSelectedConfig();
@@ -156,7 +158,7 @@ class Index {
     // snake type listener
     this.dialog.typeButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        this.page.board.audioService.play(Sound.BUTTON);
+        container.resolve(AudioService).play(Sound.BUTTON);
         this.page.board.setSnakeType(button.dataset.type as SnakeType);
 
         this.updateSelectedConfig();
@@ -165,7 +167,7 @@ class Index {
 
     this.dialog.startButton.addEventListener('click', (event) => {
       (event.target as HTMLButtonElement).classList.add('selected');
-      this.page.board.audioService.play(Sound.BUTTON);
+      container.resolve(AudioService).play(Sound.BUTTON);
       this.page.startGame();
       setTimeout(() => {
         this.dialog.setDialogState(DialogState.HIDDEN);
@@ -173,7 +175,7 @@ class Index {
     });
 
     this.restartButton.addEventListener('click', (event) => {
-      this.page.board.audioService.play(Sound.BUTTON);
+      container.resolve(AudioService).play(Sound.BUTTON);
 
       // TODO: disable all buttons except sound and restart
       [...document.querySelectorAll('button')].forEach(
@@ -196,7 +198,7 @@ class Index {
     fromEvent(this.pauseButton, 'click')
         .pipe(
             tap(() => {
-              this.page.board.audioService.play(Sound.BUTTON);
+              container.resolve(AudioService).play(Sound.BUTTON);
             }),
             throttleTime(200))
         .subscribe((event) => {
@@ -206,7 +208,7 @@ class Index {
         });
 
     this.pencilButton.addEventListener('click', (event) => {
-      this.page.board.audioService.play(Sound.BUTTON);
+      container.resolve(AudioService).play(Sound.BUTTON);
       this.removeMouseUpDownListners();
 
       (event.target as HTMLButtonElement).classList.toggle('selected');
@@ -219,7 +221,7 @@ class Index {
     });
 
     this.eraserButton.addEventListener('click', (event) => {
-      this.page.board.audioService.play(Sound.BUTTON);
+      container.resolve(AudioService).play(Sound.BUTTON);
       this.removeMouseUpDownListners();
 
       (event.target as HTMLButtonElement).classList.toggle('selected');

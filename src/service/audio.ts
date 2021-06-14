@@ -1,4 +1,5 @@
-import { Howl, Howler } from 'howler';
+import {Howl, Howler} from 'howler';
+import {injectable, singleton} from 'tsyringe';
 
 export enum Sound {
   EAT1 = 'eat1',
@@ -12,8 +13,10 @@ export enum Sound {
   DRAW = 'draw',
 }
 
+@injectable()
+@singleton()
 export class AudioService {
-  readonly sounds: { [key: string]: Howl } = {};
+  readonly sounds: {[key: string]: Howl} = {};
   readonly isLoaded = this.loadFiles(Object.values(Sound));
   isMuted = false;
 
@@ -28,7 +31,7 @@ export class AudioService {
   toggleMute(soundButton: HTMLButtonElement) {
     this.isMuted = !this.isMuted;
     soundButton.innerText =
-      this.isMuted ? 'Sound on / [off]' : 'Sound [on] / off';
+        this.isMuted ? 'Sound on / [off]' : 'Sound [on] / off';
     Howler.mute(this.isMuted);
   }
 
