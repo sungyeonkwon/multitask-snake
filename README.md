@@ -17,7 +17,7 @@ https://multitasking-snake.xyz/
 
 ### Improve
 
-- [ ] one-control should expire after 10 seconds
+- [x] One-control should expire after 10 seconds
 - [ ] Decrease factor for more food version
 
 ### General

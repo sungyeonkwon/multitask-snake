@@ -5,6 +5,7 @@ import {Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType} from '../constants';
 import {getRandomEatSound} from '../helpers';
 import {AudioService, Sound} from '../service/audio';
 import {FoodService} from '../service/food';
+import {Dashboard} from '../ui/dashboard';
 import {Enemy} from './enemy';
 
 import {Snake} from './snake';
@@ -16,7 +17,6 @@ export class Board {
   bounds: Coords;
   selectedSnake = 0;
   wall: Coords[] = [];
-  wallInfo: HTMLElement = document.querySelector('.wall');
   dashboardMode: HTMLElement = document.querySelector('.mode');
   deathReason$ = new ReplaySubject<GameOver|null>(1);
   enemySnake?: Enemy|null;
@@ -33,11 +33,8 @@ export class Board {
     this.bounds = {x: width, y: height};
 
     this.isMultiselectModeOn$.subscribe(isOn => {
-      if (isOn) {
-        this.dashboardMode.classList.add('show');
-      } else {
-        this.dashboardMode.classList.remove('show');
-      }
+      container.resolve(Dashboard).updateStatus(
+          'Red food mode: All snakes on one control!', isOn);
     })
   }
 
@@ -70,7 +67,7 @@ export class Board {
     this.selectedSnake = 0;
     this.deathReason$.next(null);
     this.enemySnake = null;
-    this.wallInfo.innerText = '0';
+    container.resolve(Dashboard).updateWallCount(0);
     container.resolve(FoodService).reset();
     this.isMultiselectModeOn$.next(false);
   }

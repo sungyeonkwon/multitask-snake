@@ -1,11 +1,11 @@
-import {injectable, singleton} from 'tsyringe';
+import {container, inject, injectable, singleton} from 'tsyringe';
 import {Coords} from '../constants';
 import {getRandomCoords} from '../helpers';
+import {Dashboard} from '../ui/dashboard';
 
 @injectable()
 @singleton()
 export class FoodService {
-  private foodInfo: HTMLElement = document.querySelector('.food');
   private eatCount = 0;
   food: Coords[] = [];
   redFood: Coords[] = [];
@@ -13,6 +13,8 @@ export class FoodService {
   // Feature-specific properties
   multiplyBy = 1;
   isRedFoodEnabled = false;
+
+  constructor(@inject('dashboard') readonly dashboard?: Dashboard) {}
 
   addFood(excludeArray: Coords[], isRedFood: boolean) {
     if (isRedFood) {
@@ -39,7 +41,7 @@ export class FoodService {
 
   increaseFoodCount() {
     this.eatCount++;
-    this.foodInfo.innerText = this.eatCount.toString();
+    container.resolve(Dashboard).updateFoodCount(this.eatCount);
   }
 
   isFoodAvailable(food: Coords): boolean {
@@ -49,7 +51,7 @@ export class FoodService {
   reset() {
     this.multiplyBy = 1;
     this.isRedFoodEnabled = false;
-    this.foodInfo.innerText = '0';
+    container.resolve(Dashboard).updateFoodCount(0);
     this.food = [];
     this.redFood = [];
   }

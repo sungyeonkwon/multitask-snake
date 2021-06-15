@@ -6,6 +6,7 @@ import {INTERVAL, SNAKES} from '../constants';
 import {getFullPattern, getStartingCoords, requestInterval} from '../helpers';
 import {AudioService, Sound} from '../service/audio';
 import {FoodService} from '../service/food';
+import {Dashboard} from '../ui/dashboard';
 import {Dialog, DialogState} from '../ui/dialog';
 
 import {Board} from './board';
@@ -24,6 +25,7 @@ export class Game {
   constructor(
       canvas: HTMLCanvasElement,
       @inject('foodService') readonly foodService?: FoodService,
+      @inject('dashboard') readonly dashboard?: Dashboard,
   ) {
     this.board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
     this.canvas = canvas;
@@ -152,7 +154,7 @@ export class Game {
     if (this.board.enemySnake) {
       this.drawSnake(this.board.enemySnake, null, true);
     }
-    this.board.wallInfo.innerText = this.board.wall.length.toString();
+    container.resolve(Dashboard).updateWallCount(this.board.wall.length);
   }
 
   private drawGrid() {
