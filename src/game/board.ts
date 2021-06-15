@@ -138,7 +138,7 @@ export class Board {
           this.getEatenFoodIndex(snake, container.resolve(FoodService).food);
       if (foodIndex >= 0) {
         hasEaten = true;
-        this.consumeFood(foodIndex, snake);
+        this.consumeFood(foodIndex, snake, false);
         this.isMultiselectModeOn$.next(false);
       }
 
@@ -156,16 +156,21 @@ export class Board {
       const enemyEatenfoodIndex = this.getEatenFoodIndex(
           this.enemySnake, container.resolve(FoodService).food);
       if (enemyEatenfoodIndex >= 0) {
-        this.consumeFood(enemyEatenfoodIndex, this.enemySnake);
+        this.consumeFood(enemyEatenfoodIndex, this.enemySnake, false, true);
       }
     }
 
     return hasEaten;
   }
 
-  private consumeFood(foodIndex: number, snake: Snake, isRedFood = false) {
+  private consumeFood(
+      foodIndex: number, snake: Snake, isRedFood: boolean, isEnemy = false) {
     snake.grow();
-    container.resolve(AudioService).play(getRandomEatSound());
+    if (isEnemy) {
+      container.resolve(AudioService).play(Sound.ENEMY);
+    } else {
+      container.resolve(AudioService).play(getRandomEatSound());
+    }
     container.resolve(FoodService)
         .replenishFood(
             foodIndex, this.snakeCount, this.getSnakeAndWallCoords(),

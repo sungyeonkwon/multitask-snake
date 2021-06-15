@@ -11,14 +11,13 @@ https://multitasking-snake.xyz/
 - [x] Version: enemy snake
 - [x] Version: multi control mode with red food
 - [x] Version: x3 more food opportunities
-- [ ] Add sound effect for drawing / enemy eating food
+- [ ] Add sound effect for drawing
 - [ ] Add acceleration
 - [ ] Themed grid / background
 
 ### General
 
 - [ ] Disable wall feature if the type is enemy
-- [ ] Enable wall / BFS movement for enemy snake
+- [ ] BFS movement for enemy snake (Make enemy snake do u-turn)
 - [ ] Add play instruction
 - [ ] Add score/screenshot dashboard
-- [ ] Make enemy snake do u-turn

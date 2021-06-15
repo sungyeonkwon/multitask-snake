@@ -11,6 +11,7 @@ export enum Sound {
   BUTTON = 'button',
   HIT = 'hit',
   DRAW = 'draw',
+  ENEMY = 'enemy',
 }
 
 @injectable()
