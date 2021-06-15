@@ -1,4 +1,4 @@
-import {container, inject, injectable, singleton} from 'tsyringe';
+import {container, injectable, singleton} from 'tsyringe';
 import {Coords} from '../constants';
 import {getRandomCoords} from '../helpers';
 import {Dashboard} from '../ui/dashboard';
@@ -14,7 +14,7 @@ export class FoodService {
   multiplyBy = 1;
   isRedFoodEnabled = false;
 
-  constructor(@inject('dashboard') readonly dashboard?: Dashboard) {}
+  // constructor(@inject('dashboard') readonly dashboard?: Dashboard) {}
 
   addFood(excludeArray: Coords[], isRedFood: boolean) {
     if (isRedFood) {

@@ -21,9 +21,6 @@ export class Board {
   deathReason$ = new ReplaySubject<GameOver|null>(1);
   enemySnake?: Enemy|null;
 
-  // Feature properties
-  isMultiselectModeOn$ = new BehaviorSubject(false);
-
   constructor(
       width: number,
       height: number,
@@ -32,7 +29,7 @@ export class Board {
   ) {
     this.bounds = {x: width, y: height};
 
-    this.isMultiselectModeOn$.subscribe(isOn => {
+    container.resolve(Dashboard).isMultiSelectionTimerOn$.subscribe(isOn => {
       container.resolve(Dashboard).updateStatus(
           'Red food mode: All snakes on one control!', isOn);
     })
@@ -69,7 +66,7 @@ export class Board {
     this.enemySnake = null;
     container.resolve(Dashboard).updateWallCount(0);
     container.resolve(FoodService).reset();
-    this.isMultiselectModeOn$.next(false);
+    container.resolve(Dashboard).isMultiSelectionTimerOn$.next(false);
   }
 
   canProceed(): boolean {
@@ -136,7 +133,7 @@ export class Board {
       if (foodIndex >= 0) {
         hasEaten = true;
         this.consumeFood(foodIndex, snake, false);
-        this.isMultiselectModeOn$.next(false);
+        container.resolve(Dashboard).isMultiSelectionTimerOn$.next(false);
       }
 
       const redFoodIndex =
@@ -144,7 +141,7 @@ export class Board {
       if (redFoodIndex >= 0) {
         hasEaten = true;
         this.consumeFood(redFoodIndex, snake, true);
-        this.isMultiselectModeOn$.next(true);
+        container.resolve(Dashboard).isMultiSelectionTimerOn$.next(true);
       }
     }
 

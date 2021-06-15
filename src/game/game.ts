@@ -36,17 +36,19 @@ export class Game {
   handleDirection(keycode: string) {
     const direction = directionKeyMap.get(keycode);
 
-    this.board.isMultiselectModeOn$.pipe(take(1)).subscribe((isOn) => {
-      if (isOn) {
-        this.board.snakes.forEach(snake => {
-          snake.setDirection(direction);
+    container.resolve(Dashboard)
+        .isMultiSelectionTimerOn$.pipe(take(1))
+        .subscribe((isOn) => {
+          if (isOn) {
+            this.board.snakes.forEach(snake => {
+              snake.setDirection(direction);
+            })
+          } else {
+            const snake = this.board.snakes.find(
+                (_, index) => index === this.board.selectedSnake);
+            snake.setDirection(direction);
+          }
         })
-      } else {
-        const snake = this.board.snakes.find(
-            (_, index) => index === this.board.selectedSnake);
-        snake.setDirection(direction);
-      }
-    })
   }
 
   handleSnakeSelection(keycode: string) {
@@ -92,8 +94,7 @@ export class Game {
 
   stopGame() {
     cancelAnimationFrame(this.intervalId.value);
-    // TODO: take(1)
-    this.board.deathReason$.pipe().subscribe((reason: GameOver) => {
+    this.board.deathReason$.pipe(take(1)).subscribe((reason: GameOver) => {
       if (!reason) return;
       this.dialog.setDialogState(
           DialogState.GAME_OVER, this.getGameOverMessage(reason));
@@ -110,6 +111,7 @@ export class Game {
     } else {
       this.render();
     }
+    container.resolve(Dashboard).pauseTimer$.next(isPausing);
     this.isGamePlaying = !this.isGamePlaying;
   }
 
@@ -235,13 +237,16 @@ export class Game {
     });
 
     // Fill head
-    this.board.isMultiselectModeOn$.pipe(take(1)).subscribe(isOn => {
-      this.ctx.fillStyle = isOn || isSnakeSelected ? Color.SNAKE_HEAD_SELECTED :
-                                                     Color.SNAKE_HEAD;
-      this.ctx.fillRect(
-          x * (BLOCK_SIZE + 1) + 1, y * (BLOCK_SIZE + 1) + 1, BLOCK_SIZE,
-          BLOCK_SIZE);
-    })
+    container.resolve(Dashboard)
+        .isMultiSelectionTimerOn$.pipe(take(1))
+        .subscribe(isOn => {
+          this.ctx.fillStyle = isOn || isSnakeSelected ?
+              Color.SNAKE_HEAD_SELECTED :
+              Color.SNAKE_HEAD;
+          this.ctx.fillRect(
+              x * (BLOCK_SIZE + 1) + 1, y * (BLOCK_SIZE + 1) + 1, BLOCK_SIZE,
+              BLOCK_SIZE);
+        })
 
     if (isEnemySnake) return;
     // Fill number
