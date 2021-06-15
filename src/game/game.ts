@@ -80,7 +80,7 @@ export class Game {
       const coords = getStartingCoords(this.board.snakeCount, i);
       snakes.push(new Snake(coords, Direction.RIGHT));
       container.resolve(FoodService)
-          .addFood(this.board.getSnakeAndWallCoords());
+          .addFood(this.board.getSnakeAndWallCoords(), false);
     }
 
     this.board.snakes = snakes;

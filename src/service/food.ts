@@ -16,7 +16,6 @@ export class FoodService {
 
   addFood(excludeArray: Coords[], isRedFood: boolean) {
     if (isRedFood) {
-      console.log('red food adding');
       this.redFood.push(getRandomCoords(excludeArray));
     } else {
       for (let i = 0; i < this.multiplyBy; i++) {
