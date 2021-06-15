@@ -15,6 +15,11 @@ https://multitasking-snake.xyz/
 - [ ] Add acceleration
 - [ ] Themed grid / background
 
+### Fix
+
+- [ ] one-control should expire after 15 seconds
+- [ ] Decrease factor for more food version
+
 ### General
 
 - [ ] Disable wall feature if the type is enemy
