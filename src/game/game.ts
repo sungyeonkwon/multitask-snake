@@ -1,7 +1,7 @@
 import {container, inject} from 'tsyringe';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, Direction, directionKeyMap, ENEMY_SNAKE_PATTERN, GameOver, selectedSnakeKeyMap, SnakeType} from '../constants';
-import {Coords, INTERVAL, SNAKES} from '../constants';
+import {INTERVAL, SNAKES} from '../constants';
 import {getFullPattern, getRandomCoords, getStartingCoords, requestInterval} from '../helpers';
 import {AudioService, Sound} from '../service/audio';
 import {FoodService} from '../service/food';
@@ -12,14 +12,11 @@ import {Enemy} from './enemy';
 import {Snake} from './snake';
 
 export class Page {
-  intervalId: any;
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
+  intervalId: {value: number, delta: number};
   board: Board;
-  canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
-  speed?: number;
-  eatCount = 0;
   dialog = new Dialog();
-  gameOverContainer: HTMLElement = document.querySelector('.gameover');
   isGamePlaying = false;
 
   constructor(
@@ -107,9 +104,7 @@ export class Page {
 
           const hasEaten = this.board.tick();
           if (hasEaten) {
-            this.eatCount++;
-            container.resolve(FoodService).foodInfo.innerText =
-                this.eatCount.toString();
+            container.resolve(FoodService).increaseFoodCount();
           }
         },
         INTERVAL,

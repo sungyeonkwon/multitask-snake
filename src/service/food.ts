@@ -4,11 +4,17 @@ import {Coords} from '../constants';
 @injectable()
 @singleton()
 export class FoodService {
+  private foodInfo: HTMLElement = document.querySelector('.food');
+  private eatCount = 0;
   food: Coords[] = [];
-  foodInfo: HTMLElement = document.querySelector('.food');
 
   addFood(newFood: Coords) {
     this.food.push(newFood);
+  }
+
+  increaseFoodCount() {
+    this.eatCount++;
+    this.foodInfo.innerText = this.eatCount.toString();
   }
 
   isFoodAvailable(food: Coords): boolean {
