@@ -3,7 +3,7 @@ export const BOARD_HEIGHT = 25;
 export const BLOCK_SIZE = 20;
 export const INIT_SNAKE_SIZE = 5;
 export const INTERVAL = 400;
-
+export const ANACONDA_FOOD_MULTIPLY_FACTOR = 4;
 export enum GameOver {
   HIT_SELF = 1,
   HIT_WALL,
@@ -68,7 +68,7 @@ export const SNAKES: SnakeConfig[] = [
       'yellow',
       'grey',
     ],
-    description: '(Coming) With abundance of food, snakes will grow faster.',
+    description: 'With abundance of food, snakes will grow faster.',
   },
   {
     type: SnakeType.PYTHON,

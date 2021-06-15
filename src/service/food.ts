@@ -1,5 +1,6 @@
 import {injectable, singleton} from 'tsyringe';
 import {Coords} from '../constants';
+import {getRandomCoords} from '../helpers';
 
 @injectable()
 @singleton()
@@ -8,8 +9,10 @@ export class FoodService {
   private eatCount = 0;
   food: Coords[] = [];
 
-  addFood(newFood: Coords) {
-    this.food.push(newFood);
+  addFood(bounds: Coords, excludeArray: Coords[], multiplyBy: number) {
+    for (let i = 0; i < multiplyBy; i++) {
+      this.food.push(getRandomCoords(bounds, excludeArray));
+    }
   }
 
   increaseFoodCount() {

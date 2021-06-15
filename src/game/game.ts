@@ -1,6 +1,6 @@
 import {container, inject} from 'tsyringe';
 
-import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, Direction, directionKeyMap, ENEMY_SNAKE_PATTERN, GameOver, selectedSnakeKeyMap, SnakeType} from '../constants';
+import {ANACONDA_FOOD_MULTIPLY_FACTOR, BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, Direction, directionKeyMap, ENEMY_SNAKE_PATTERN, GameOver, selectedSnakeKeyMap, SnakeType} from '../constants';
 import {INTERVAL, SNAKES} from '../constants';
 import {getFullPattern, getRandomCoords, getStartingCoords, requestInterval} from '../helpers';
 import {AudioService, Sound} from '../service/audio';
@@ -50,15 +50,18 @@ export class Page {
       this.activateEnemySnake();
     }
 
-    // populate snakes
+    // Populate snakes
     const snakes: Snake[] = [];
     for (let i = 0; i < this.board.snakeCount; i++) {
       const coords = getStartingCoords(this.board.snakeCount, i);
       snakes.push(new Snake(coords, Direction.RIGHT));
-
-      const newFood = getRandomCoords(
-          this.board.bounds, this.board.getSnakeAndWallCoords());
-      container.resolve(FoodService).addFood(newFood);
+      const foodAmount = this.board.snakeType === SnakeType.ANACONDA ?
+          ANACONDA_FOOD_MULTIPLY_FACTOR :
+          1;
+      container.resolve(FoodService)
+          .addFood(
+              this.board.bounds, this.board.getSnakeAndWallCoords(),
+              foodAmount);
     }
 
     this.board.snakes = snakes;
