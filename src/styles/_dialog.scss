@@ -2,6 +2,7 @@
 @import '_variables';
 
 #dialog {
+  border: 4px solid $border-grey;
   background: $lightgreen;
   position: absolute;
   width: 70vw;
