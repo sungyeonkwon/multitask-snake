@@ -67,7 +67,7 @@ export class Board {
       const snake = this.snakes[i];
       const hitWall = this.bumpToWall(snake.newHead);
       const hitSelf = this.bumpToSnake(snake.newHead);
-      const hitEnemy = this.bumpToEnemy(snake.newHead);
+      const hitEnemy = this.bumpToEnemy(snake);
       if (hitWall) {
         container.resolve(AudioService).play(Sound.HIT);
         this.deathReason$.next(GameOver.HIT_WALL);
@@ -156,10 +156,13 @@ export class Board {
                         item.y === snake.sequence[1].y)});
   }
 
-  private bumpToEnemy(newHead: Coords): boolean {
-    return this.enemySnake &&
-        this.enemySnake.sequence.some(
-            segment => segment.x === newHead.x && segment.y === newHead.y);
+  private bumpToEnemy(snake: Snake): boolean {
+    if (!this.enemySnake) return false;
+    return snake.sequence.some(segment => {
+      return this.enemySnake.sequence.some(
+          enemySegment =>
+              enemySegment.x === segment.x && enemySegment.y === segment.y);
+    });
   }
 
   private bumpToSnake(newHead: Coords): boolean {
