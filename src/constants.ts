@@ -3,7 +3,15 @@ export const BOARD_HEIGHT = 25;
 export const BLOCK_SIZE = 20;
 export const INIT_SNAKE_SIZE = 5;
 export const INTERVAL = 400;
-export const ANACONDA_FOOD_MULTIPLY_FACTOR = 4;
+export const FOOD_MULTIPLY_FACTOR = 4;
+
+export enum Feature {
+  UNSPECIFIED = 'unspecified',
+  UNI_CONTROL = 'uniControl',
+  MORE_FOOD = 'moreFood',
+  ENEMY_SNAKE = 'enemySnake',
+}
+
 export enum GameOver {
   HIT_SELF = 1,
   HIT_WALL,
@@ -13,7 +21,7 @@ export enum GameOver {
 export enum SnakeType {
   VIPER = 'Viper',
   MAMBA = 'Mamba',
-  DISPHOLIDUS = 'Dispholidus',
+  COBRA = 'Cobra',
   ANACONDA = 'Anaconda',
   PYTHON = 'Python',
   ANILIUS = 'Anilius',
@@ -54,13 +62,13 @@ export const SNAKES: SnakeConfig[] = [
     description: 'Beware: Enemy snake is present.',
   },
   {
-    type: SnakeType.DISPHOLIDUS,
+    type: SnakeType.COBRA,
     pattern: [
       'red',
       'blue',
       'red',
     ],
-    description: '(Coming) Eat red food, all snakes to be under one control.',
+    description: 'Eat red food, all snakes to be under one control.',
   },
   {
     type: SnakeType.ANACONDA,
@@ -125,3 +133,11 @@ selectedSnakeKeyMap.set('Digit2', 2);
 selectedSnakeKeyMap.set('Digit3', 3);
 selectedSnakeKeyMap.set('Digit4', 4);
 selectedSnakeKeyMap.set('Digit5', 5);
+
+export const snakeTypeFeatureMap = new Map<SnakeType, Feature>();
+snakeTypeFeatureMap.set(SnakeType.MAMBA, Feature.UNSPECIFIED);
+snakeTypeFeatureMap.set(SnakeType.VIPER, Feature.ENEMY_SNAKE);
+snakeTypeFeatureMap.set(SnakeType.COBRA, Feature.UNI_CONTROL);
+snakeTypeFeatureMap.set(SnakeType.ANACONDA, Feature.MORE_FOOD);
+snakeTypeFeatureMap.set(SnakeType.ANILIUS, Feature.UNSPECIFIED);
+snakeTypeFeatureMap.set(SnakeType.PYTHON, Feature.UNSPECIFIED);

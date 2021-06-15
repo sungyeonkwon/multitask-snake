@@ -1,6 +1,5 @@
 import {container, inject} from 'tsyringe';
 import {Coords, Direction} from '../constants';
-import {getNextCoords, isDirectionOpposite} from '../helpers';
 import {FoodService} from '../service/food';
 import {Snake} from './snake';
 

@@ -1,23 +1,13 @@
-/**
- * Example usage:
- *
- * z-index: z('modal', 'overlay');
- */
-@function z($layers...) {
-  @if not map-has-nested-keys($z-layers, $layers...) {
-    @warn 'No layer found for `#{inspect($layers...)}` in $z-layers map. Property omitted.';
-  }
-  @return map-deep-get($z-layers, $layers...);
-}
-
-@keyframes rotate {
+@keyframes flicker {
   0% {
-    transform: translateY(0);
+    opacity: 0.1;
+    color: red;
   }
-  25% {
-    transform: translateY(10px);
+  50% {
+    opacity: 1;
   }
   100% {
-    transform: translateY(0);
+    opacity: 0.1;
+    color: red;
   }
 }

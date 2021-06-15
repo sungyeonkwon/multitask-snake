@@ -8,13 +8,11 @@ https://multitasking-snake.xyz/
 
 ### Feature
 
-- [x] Make food shine
-- [x] Add sound on/off button
 - [x] Version: enemy snake
+- [x] Version: multi control mode with red food
+- [x] Version: x3 more food opportunities
 - [ ] Add sound effect for drawing / enemy eating food
 - [ ] Add acceleration
-- [ ] Version: multi control mode with red food
-- [ ] Version: x3 more food opportunities
 - [ ] Themed grid / background
 
 ### General

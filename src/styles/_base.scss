@@ -66,6 +66,15 @@ canvas {
     font-size: 18px;
     margin: 0;
   }
+
+  .mode {
+    display: none;
+    animation: flicker 1s linear infinite;
+
+    &.show {
+      display: inline-block;
+    }
+  }
 }
 
 .control {

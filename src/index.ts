@@ -3,10 +3,10 @@ import 'reflect-metadata';
 
 import {asyncScheduler, fromEvent} from 'rxjs';
 import {filter, tap, throttleTime} from 'rxjs/operators';
-import {container, inject} from 'tsyringe';
+import {container} from 'tsyringe';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, directionKeyMap, INTERVAL, selectedSnakeKeyMap, SnakeType} from './constants';
-import {Page} from './game/game';
+import {Game} from './game/game';
 import {AudioService, Sound} from './service/audio';
 import {DialogState} from './ui/dialog';
 
@@ -18,8 +18,8 @@ enum Selector {
 class Index {
   private isDebugMode = this.getDebugMode();
   private canvas = document.querySelector('canvas');
-  page = new Page(this.canvas);
-  dialog = this.page.dialog;
+  game = new Game(this.canvas);
+  dialog = this.game.dialog;
 
   restartButton: HTMLButtonElement = document.querySelector('button.restart');
   pauseButton: HTMLButtonElement = document.querySelector('button.pause');
@@ -66,7 +66,7 @@ class Index {
   // separate snake count and type
   updateSelectedConfig() {
     this.dialog.countButtons.forEach((button) => {
-      if (this.page.board.snakeCount === Number(button.dataset.count)) {
+      if (this.game.board.snakeCount === Number(button.dataset.count)) {
         button.classList.add(`${Selector.SELECTED}`);
       } else {
         button.classList.remove(`${Selector.SELECTED}`);
@@ -74,7 +74,7 @@ class Index {
     });
 
     this.dialog.typeButtons.forEach((button) => {
-      if (this.page.board.snakeType === button.dataset.type) {
+      if (this.game.board.snakeType === button.dataset.type) {
         button.classList.add(`${Selector.SELECTED}`);
       } else {
         button.classList.remove(`${Selector.SELECTED}`);
@@ -88,8 +88,8 @@ class Index {
     document.body.style.cursor = 'crosshair';
 
     // only if the rendering isn't on
-    if (!this.page.isGamePlaying) {
-      this.page.render(true);
+    if (!this.game.isGamePlaying) {
+      this.game.render(true);
     }
   };
 
@@ -99,21 +99,21 @@ class Index {
     document.body.style.cursor = 'default';
 
     // only if the rendering isn't on
-    if (!this.page.isGamePlaying) {
-      cancelAnimationFrame(this.page.intervalId.value);
+    if (!this.game.isGamePlaying) {
+      cancelAnimationFrame(this.game.intervalId.value);
     }
   };
 
   pencilMouseMoveListener = (event: MouseEvent) => {
     if (!this.shouldRecord) return;
     const [normalisedX, normalisedY] = this.getNormalisedXY(event);
-    this.page.board.setWalls(normalisedX, normalisedY);
+    this.game.board.setWalls(normalisedX, normalisedY);
   };
 
   eraserMouseMoveListener = (event: MouseEvent) => {
     if (!this.shouldRecord) return;
     const [normalisedX, normalisedY] = this.getNormalisedXY(event);
-    this.page.board.removeWalls(normalisedX, normalisedY);
+    this.game.board.removeWalls(normalisedX, normalisedY);
   };
 
   addShouldRecordListeners() {
@@ -149,7 +149,7 @@ class Index {
     this.dialog.countButtons.forEach((button) => {
       button.addEventListener('click', () => {
         container.resolve(AudioService).play(Sound.BUTTON);
-        this.page.board.setSnakeCount(Number(button.dataset.count));
+        this.game.board.setSnakeCount(Number(button.dataset.count));
 
         this.updateSelectedConfig();
       });
@@ -159,7 +159,7 @@ class Index {
     this.dialog.typeButtons.forEach((button) => {
       button.addEventListener('click', () => {
         container.resolve(AudioService).play(Sound.BUTTON);
-        this.page.board.setSnakeType(button.dataset.type as SnakeType);
+        this.game.board.setSnakeType(button.dataset.type as SnakeType);
 
         this.updateSelectedConfig();
       });
@@ -168,7 +168,7 @@ class Index {
     this.dialog.startButton.addEventListener('click', (event) => {
       (event.target as HTMLButtonElement).classList.add('selected');
       container.resolve(AudioService).play(Sound.BUTTON);
-      this.page.startGame();
+      this.game.startGame();
       setTimeout(() => {
         this.dialog.setDialogState(DialogState.HIDDEN);
       }, 200);
@@ -190,8 +190,9 @@ class Index {
 
       setTimeout(() => {
         this.restartButton.classList.remove('selected');
-        this.page.board.resetBoard();
-        this.page.dialog.setDialogState(DialogState.GAME_CONFIG);
+        this.game.board.resetBoard();
+        this.game.feature = null;
+        this.game.dialog.setDialogState(DialogState.GAME_CONFIG);
       }, 200);
     });
 
@@ -203,7 +204,7 @@ class Index {
             throttleTime(200))
         .subscribe((event) => {
           const isPausing = this.pauseButton.innerText === 'Pause';
-          this.page.pauseGame(isPausing);
+          this.game.pauseGame(isPausing);
           this.flipPauseButtons(isPausing, event.target as HTMLButtonElement);
         });
 
@@ -245,9 +246,9 @@ class Index {
     directionKey$
         .pipe(throttleTime(
             INTERVAL, asyncScheduler, {leading: true, trailing: true}))
-        .subscribe((event) => this.page.handleDirection(event.code));
+        .subscribe((event) => this.game.handleDirection(event.code));
     selectSnakeKey$.subscribe(
-        (event) => this.page.handleSnakeSelection(event.code));
+        (event) => this.game.handleSnakeSelection(event.code));
   }
 
   private flipPauseButtons(isPausing = true, button: HTMLButtonElement) {

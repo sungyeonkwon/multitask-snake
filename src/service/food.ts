@@ -8,11 +8,34 @@ export class FoodService {
   private foodInfo: HTMLElement = document.querySelector('.food');
   private eatCount = 0;
   food: Coords[] = [];
+  redFood: Coords[] = [];
 
-  addFood(bounds: Coords, excludeArray: Coords[], multiplyBy: number) {
-    for (let i = 0; i < multiplyBy; i++) {
-      this.food.push(getRandomCoords(bounds, excludeArray));
+  // Feature-specific properties
+  multiplyBy = 1;
+  isRedFoodEnabled = false;
+
+  addFood(excludeArray: Coords[], isRedFood: boolean) {
+    if (isRedFood) {
+      console.log('red food adding');
+      this.redFood.push(getRandomCoords(excludeArray));
+    } else {
+      for (let i = 0; i < this.multiplyBy; i++) {
+        this.food.push(getRandomCoords(excludeArray));
+      }
     }
+  }
+
+  replenishFood(
+      foodIndex: number, snakeCount: number, excludeArray: Coords[],
+      isRedFood: boolean) {
+    // Provide red food
+    if (!isRedFood && this.eatCount !== 0 && this.eatCount === snakeCount &&
+        this.isRedFoodEnabled) {
+      this.redFood.push(getRandomCoords(excludeArray));
+    }
+    const foodBatch = isRedFood ? this.redFood : this.food;
+    foodBatch.splice(foodIndex, 1);
+    this.addFood(excludeArray, isRedFood);
   }
 
   increaseFoodCount() {
@@ -25,7 +48,12 @@ export class FoodService {
   }
 
   reset() {
+    this.multiplyBy = 1;
+    this.isRedFoodEnabled = false;
     this.foodInfo.innerText = '0';
     this.food = [];
+    this.redFood = [];
   }
+
+  private addRedFood() {}
 }

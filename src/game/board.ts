@@ -1,8 +1,8 @@
-import {ReplaySubject} from 'rxjs';
+import {BehaviorSubject, ReplaySubject} from 'rxjs';
 import {container, inject} from 'tsyringe';
 
-import {BOARD_WIDTH, Coords, DEFAULT_GAME_CONFIG, Direction, GameOver, SnakeType} from '../constants';
-import {getRandomCoords, getRandomEatSound} from '../helpers';
+import {Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType} from '../constants';
+import {getRandomEatSound} from '../helpers';
 import {AudioService, Sound} from '../service/audio';
 import {FoodService} from '../service/food';
 import {Enemy} from './enemy';
@@ -17,8 +17,12 @@ export class Board {
   selectedSnake = 0;
   wall: Coords[] = [];
   wallInfo: HTMLElement = document.querySelector('.wall');
+  dashboardMode: HTMLElement = document.querySelector('.mode');
   deathReason$ = new ReplaySubject<GameOver|null>(1);
   enemySnake?: Enemy|null;
+
+  // Feature properties
+  isMultiselectModeOn$ = new BehaviorSubject(false);
 
   constructor(
       width: number,
@@ -27,6 +31,14 @@ export class Board {
       @inject('foodService') readonly foodService?: FoodService,
   ) {
     this.bounds = {x: width, y: height};
+
+    this.isMultiselectModeOn$.subscribe(isOn => {
+      if (isOn) {
+        this.dashboardMode.classList.add('show');
+      } else {
+        this.dashboardMode.classList.remove('show');
+      }
+    })
   }
 
   get width(): number {
@@ -60,6 +72,7 @@ export class Board {
     this.enemySnake = null;
     this.wallInfo.innerText = '0';
     container.resolve(FoodService).reset();
+    this.isMultiselectModeOn$.next(false);
   }
 
   canProceed(): boolean {
@@ -120,16 +133,28 @@ export class Board {
     for (let i = 0; i < this.snakes.length; i++) {
       const snake = this.snakes[i];
       snake.step();
-      const foodIndex = this.getEatenFoodIndex(snake);
+
+      const foodIndex =
+          this.getEatenFoodIndex(snake, container.resolve(FoodService).food);
       if (foodIndex >= 0) {
         hasEaten = true;
         this.consumeFood(foodIndex, snake);
+        this.isMultiselectModeOn$.next(false);
+      }
+
+      const redFoodIndex =
+          this.getEatenFoodIndex(snake, container.resolve(FoodService).redFood);
+      if (redFoodIndex >= 0) {
+        hasEaten = true;
+        this.consumeFood(redFoodIndex, snake, true);
+        this.isMultiselectModeOn$.next(true);
       }
     }
 
     if (this.enemySnake) {
       this.enemySnake.step();
-      const enemyEatenfoodIndex = this.getEatenFoodIndex(this.enemySnake);
+      const enemyEatenfoodIndex = this.getEatenFoodIndex(
+          this.enemySnake, container.resolve(FoodService).food);
       if (enemyEatenfoodIndex >= 0) {
         this.consumeFood(enemyEatenfoodIndex, this.enemySnake);
       }
@@ -138,22 +163,22 @@ export class Board {
     return hasEaten;
   }
 
-  private consumeFood(foodIndex: number, snake: Snake) {
+  private consumeFood(foodIndex: number, snake: Snake, isRedFood = false) {
     snake.grow();
     container.resolve(AudioService).play(getRandomEatSound());
-    container.resolve(FoodService).food.splice(foodIndex, 1);
     container.resolve(FoodService)
-        .food.push(getRandomCoords(this.bounds, this.getSnakeAndWallCoords()));
+        .replenishFood(
+            foodIndex, this.snakeCount, this.getSnakeAndWallCoords(),
+            isRedFood);
   }
 
-  private getEatenFoodIndex(snake: Snake) {
+  private getEatenFoodIndex(snake: Snake, foodArray: Coords[]) {
     // TODO: Temporary fix for the frame missing the new head position
-    return container.resolve(FoodService)
-        .food.findIndex(
-            (item) => {return (item.x === snake.sequence[0].x &&
-                               item.y === snake.sequence[0].y) ||
-                       (item.x === snake.sequence[1].x &&
-                        item.y === snake.sequence[1].y)});
+    return foodArray.findIndex(
+        (item) => {return (item.x === snake.sequence[0].x &&
+                           item.y === snake.sequence[0].y) ||
+                   (item.x === snake.sequence[1].x &&
+                    item.y === snake.sequence[1].y)});
   }
 
   private bumpToEnemy(snake: Snake): boolean {
