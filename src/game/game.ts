@@ -1,7 +1,7 @@
 import {take} from 'rxjs/operators';
 import {container, inject} from 'tsyringe';
 
-import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, Coords, Direction, directionKeyMap, ENEMY_SNAKE_PATTERN, Feature, FOOD_MULTIPLY_FACTOR, GameOver, selectedSnakeKeyMap, SnakeType, snakeTypeFeatureMap} from '../constants';
+import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, Coords, Direction, directionKeyMap, ENEMY_SNAKE_PATTERN, Feature, FIXED_FOOD_SIZE, GameOver, selectedSnakeKeyMap, SnakeType, snakeTypeFeatureMap} from '../constants';
 import {INTERVAL, SNAKES} from '../constants';
 import {getFullPattern, getStartingCoords, requestInterval} from '../helpers';
 import {AudioService, Sound} from '../service/audio';
@@ -64,7 +64,8 @@ export class Game {
         this.activateEnemySnake();
         break;
       case SnakeType.ANACONDA:
-        container.resolve(FoodService).multiplyBy = FOOD_MULTIPLY_FACTOR;
+        container.resolve(FoodService).fixedFoodSize = FIXED_FOOD_SIZE;
+        break;
       case SnakeType.COBRA:
         container.resolve(FoodService).isRedFoodEnabled = true;
         break;
@@ -80,11 +81,24 @@ export class Game {
 
     // Populate snakes
     const snakes: Snake[] = [];
-    for (let i = 0; i < this.board.snakeCount; i++) {
-      const coords = getStartingCoords(this.board.snakeCount, i);
-      snakes.push(new Snake(coords, Direction.RIGHT));
-      container.resolve(FoodService)
-          .addFood(this.board.getSnakeAndWallCoords(), false);
+
+    if (container.resolve(FoodService).fixedFoodSize) {
+      for (let i = 0; i < this.board.snakeCount; i++) {
+        const coords = getStartingCoords(this.board.snakeCount, i);
+        snakes.push(new Snake(coords, Direction.RIGHT));
+      }
+      for (let i = 0; i < container.resolve(FoodService).fixedFoodSize; i++) {
+        container.resolve(FoodService)
+            .addFood(this.board.getSnakeAndWallCoords(), false);
+      }
+    } else {
+      for (let i = 0; i < this.board.snakeCount; i++) {
+        const coords = getStartingCoords(this.board.snakeCount, i);
+        snakes.push(new Snake(coords, Direction.RIGHT));
+
+        container.resolve(FoodService)
+            .addFood(this.board.getSnakeAndWallCoords(), false);
+      }
     }
 
     this.board.snakes = snakes;
@@ -263,6 +277,7 @@ export class Game {
   private drawFoodPiece(
       centerX: number, centerY: number, r: number, opacity: number,
       rgb: number[]) {
+    if (r < 0) return;
     this.ctx.beginPath();
     this.ctx.arc(centerX, centerY, r, 0, 2 * Math.PI, false);
     this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;

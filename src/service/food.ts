@@ -1,6 +1,6 @@
 import {container, injectable, singleton} from 'tsyringe';
 import {Coords} from '../constants';
-import {getRandomCoords} from '../helpers';
+import {getRandomCoords, isDebugMode} from '../helpers';
 import {Dashboard} from '../ui/dashboard';
 
 @injectable()
@@ -10,19 +10,14 @@ export class FoodService {
   food: Coords[] = [];
   redFood: Coords[] = [];
 
-  // Feature-specific properties
-  multiplyBy = 1;
   isRedFoodEnabled = false;
-
-  // constructor(@inject('dashboard') readonly dashboard?: Dashboard) {}
+  fixedFoodSize?: number;
 
   addFood(excludeArray: Coords[], isRedFood: boolean) {
     if (isRedFood) {
       this.redFood.push(getRandomCoords(excludeArray));
     } else {
-      for (let i = 0; i < this.multiplyBy; i++) {
-        this.food.push(getRandomCoords(excludeArray));
-      }
+      this.food.push(getRandomCoords(excludeArray));
     }
   }
 
@@ -30,8 +25,9 @@ export class FoodService {
       foodIndex: number, snakeCount: number, excludeArray: Coords[],
       isRedFood: boolean) {
     // Provide red food
-    if (!isRedFood && this.eatCount !== 0 && this.eatCount === snakeCount &&
-        this.isRedFoodEnabled) {
+    if ((!isRedFood && this.eatCount !== 0 && this.eatCount === snakeCount &&
+         this.isRedFoodEnabled) ||
+        this.isRedFoodEnabled && isDebugMode()) {
       this.redFood.push(getRandomCoords(excludeArray));
     }
     const foodBatch = isRedFood ? this.redFood : this.food;
@@ -49,12 +45,10 @@ export class FoodService {
   }
 
   reset() {
-    this.multiplyBy = 1;
     this.isRedFoodEnabled = false;
     container.resolve(Dashboard).updateFoodCount(0);
     this.food = [];
+    this.eatCount = 0;
     this.redFood = [];
   }
-
-  private addRedFood() {}
 }

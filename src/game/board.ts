@@ -64,9 +64,8 @@ export class Board {
     this.selectedSnake = 0;
     this.deathReason$.next(null);
     this.enemySnake = null;
-    container.resolve(Dashboard).updateWallCount(0);
+    container.resolve(Dashboard).reset();
     container.resolve(FoodService).reset();
-    container.resolve(Dashboard).isMultiSelectionTimerOn$.next(false);
   }
 
   canProceed(): boolean {

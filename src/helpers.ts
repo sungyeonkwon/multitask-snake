@@ -86,3 +86,9 @@ export function getRandomEatSound() {
   const eats = Object.values(Sound).filter(sound => sound.includes('eat'));
   return eats[Math.floor(Math.random() * eats.length)];
 }
+
+export function isDebugMode() {
+  var url = new URL(window.location.href);
+  var params = new URLSearchParams(url.search);
+  return params.get('debug');
+}

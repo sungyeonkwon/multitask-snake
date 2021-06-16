@@ -3,7 +3,7 @@ export const BOARD_HEIGHT = 25;
 export const BLOCK_SIZE = 20;
 export const INIT_SNAKE_SIZE = 5;
 export const INTERVAL = 400;
-export const FOOD_MULTIPLY_FACTOR = 4;
+export const FIXED_FOOD_SIZE = 20;
 
 export enum Feature {
   UNSPECIFIED = 'unspecified',

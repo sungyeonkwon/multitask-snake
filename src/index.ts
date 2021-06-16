@@ -7,6 +7,7 @@ import {container} from 'tsyringe';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, directionKeyMap, INTERVAL, selectedSnakeKeyMap, SnakeType} from './constants';
 import {Game} from './game/game';
+import {isDebugMode} from './helpers';
 import {AudioService, Sound} from './service/audio';
 import {DialogState} from './ui/dialog';
 
@@ -16,7 +17,6 @@ enum Selector {
 }
 
 class Index {
-  private isDebugMode = this.getDebugMode();
   private canvas = document.querySelector('canvas');
   game = new Game(this.canvas);
   dialog = this.game.dialog;
@@ -38,7 +38,7 @@ class Index {
   }
 
   private enableDebugMode() {
-    if (!this.isDebugMode) return;
+    if (!isDebugMode()) return;
 
     console.log('[DEV] enableDebugMode');
     const gridRow = document.createElement('div');
@@ -50,12 +50,6 @@ class Index {
       gridRow.appendChild(span);
     }
     document.querySelector('.container').prepend(gridRow);
-  }
-
-  private getDebugMode() {
-    var url = new URL(window.location.href);
-    var params = new URLSearchParams(url.search);
-    return params.get('debug');
   }
 
   initCanvas() {

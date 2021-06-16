@@ -17,12 +17,13 @@ https://multitasking-snake.xyz/
 
 ### Improve
 
-- [x] One-control should expire after 10 seconds
-- [ ] Decrease factor for more food version
+- [x] One-control should expire after 16 seconds
+- [x] Decrease factor for more food version
 
 ### General
 
 - [ ] Disable wall feature if the type is enemy
 - [ ] BFS movement for enemy snake (Make enemy snake do u-turn)
 - [ ] Add play instruction
-- [ ] Add score/screenshot dashboard
+- [ ] Add score/screenshot dashboard -> small image with pillow
+- [ ] Make it responsive

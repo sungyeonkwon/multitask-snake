@@ -1,8 +1,8 @@
-import {BehaviorSubject, never, timer} from 'rxjs';
-import {switchMap, tap, withLatestFrom} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, never, timer} from 'rxjs';
+import {map, switchMap, tap, withLatestFrom} from 'rxjs/operators';
 import {injectable, singleton} from 'tsyringe';
 
-const RED_FOOD_TIMER = 16;
+const RED_FOOD_TIME = 16;
 @injectable()
 @singleton()
 export class Dashboard {
@@ -13,31 +13,40 @@ export class Dashboard {
   foodCount = this.dashboardElement.querySelector('.food') as HTMLSpanElement;
 
   timer = this.dashboardElement.querySelector('.timer') as HTMLSpanElement;
+  time = 0;
   isMultiSelectionTimerOn$ = new BehaviorSubject(false);
   pauseTimer$ = new BehaviorSubject(false);
-  time = 0;
+  shouldKeepTime = false;
 
   constructor() {
-    // resume / reset needs to stop the timer
-    this.isMultiSelectionTimerOn$
+    combineLatest(
+        this.isMultiSelectionTimerOn$,
+        this.pauseTimer$,
+        )
         .pipe(
-            tap(isOn => {
-              if (!isOn) this.timer.innerText = '';
+            tap(([isOn, _paused]) => {
+              if (!isOn) {
+                this.timer.innerText = '';
+              }
             }),
-            withLatestFrom(this.pauseTimer$),
-            switchMap(([isOn, _pause]) => isOn ? timer(0, 1000) : never()))
-        .subscribe((value) => {
-          if (value === 0) this.time = 0;
+            switchMap(
+                ([isOn, paused]) => isOn ?
+                    timer(0, 1000).pipe(map((n) => [n, paused])) :
+                    never()),
+            )
+        .subscribe(([timer, paused]) => {
+          if (paused) {
+            this.shouldKeepTime = true;
+            return;
+          };
+          if (timer === 0 && !paused && !this.shouldKeepTime) this.time = 0;
+          if (!paused) this.shouldKeepTime = false;
           this.time++;
           this.timer.innerText = '00:' +
-              `${RED_FOOD_TIMER - this.time}`.padStart(2, '0');
+              `${RED_FOOD_TIME - this.time}`.padStart(2, '0');
 
-          if (this.time > RED_FOOD_TIMER) {
-            this.statusElement.classList.remove('show');
-            this.timer.innerText = '';
-            this.time = 0;
-            this.isMultiSelectionTimerOn$.next(false);
-            this.pauseTimer$.next(false);
+          if (this.time > RED_FOOD_TIME) {
+            this.destroyTimer()
           }
         });
   }
@@ -57,5 +66,19 @@ export class Dashboard {
 
   updateWallCount(count: number) {
     this.wallCount.innerText = count.toString();
+  }
+
+  reset() {
+    this.updateWallCount(0);
+    this.updateFoodCount(0);
+    this.destroyTimer();
+  }
+
+  private destroyTimer() {
+    this.statusElement.classList.remove('show');
+    this.timer.innerText = '';
+    this.time = 0;
+    this.isMultiSelectionTimerOn$.next(false);
+    this.pauseTimer$.next(false);
   }
 }
