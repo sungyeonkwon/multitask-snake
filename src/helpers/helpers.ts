@@ -1,5 +1,5 @@
-import {BOARD_HEIGHT, BOARD_WIDTH, Coords, Direction} from './constants';
-import {Sound} from './service/audio';
+import {BOARD_HEIGHT, BOARD_WIDTH, Coords, Direction} from '../constants';
+import {Sound} from '../service/audio';
 
 export function getStartingCoords(snakeCount: number, index: number) {
   return {

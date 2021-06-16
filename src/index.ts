@@ -7,7 +7,7 @@ import {container} from 'tsyringe';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, directionKeyMap, INTERVAL, selectedSnakeKeyMap, SnakeType} from './constants';
 import {Game} from './game/game';
-import {isDebugMode} from './helpers';
+import {isDebugMode} from './helpers/helpers';
 import {AudioService, Sound} from './service/audio';
 import {DialogState} from './ui/dialog';
 

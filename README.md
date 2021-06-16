@@ -15,15 +15,10 @@ https://multitasking-snake.xyz/
 - [ ] Add acceleration
 - [ ] Themed grid / background
 
-### Improve
-
-- [x] One-control should expire after 16 seconds
-- [x] Decrease factor for more food version
-
 ### General
 
-- [ ] Disable wall feature if the type is enemy
-- [ ] BFS movement for enemy snake (Make enemy snake do u-turn)
+- [ ] BFS movement for enemy snake (Make enemy snake do u-turn / not to be stuck)
+- [ ] Make patterns more granular per snake
 - [ ] Add play instruction
 - [ ] Add score/screenshot dashboard -> small image with pillow
 - [ ] Make it responsive
