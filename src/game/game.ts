@@ -1,7 +1,7 @@
 import {take} from 'rxjs/operators';
 import {container, inject} from 'tsyringe';
 
-import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, Coords, Direction, directionKeyMap, ENEMY_SNAKE_PATTERN, Feature, FIXED_FOOD_SIZE, GameOver, selectedSnakeKeyMap, SnakeType, snakeTypeFeatureMap} from '../constants';
+import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, Coords, Direction, directionKeyMap, ENEMY_SNAKE_PATTERN, Feature, FIXED_FOOD_SIZE, GameOver, MIN_INTERVAL, selectedSnakeKeyMap, SnakeType, snakeTypeFeatureMap} from '../constants';
 import {INTERVAL, SNAKES} from '../constants';
 import {getFullPattern, getStartingCoords, requestInterval} from '../helpers/helpers';
 import {AudioService, Sound} from '../service/audio';
@@ -21,6 +21,8 @@ export class Game {
   dialog = new Dialog();
   isGamePlaying = false;
   feature: Feature|null;
+  interval = INTERVAL;
+  shouldFrameAccelerate = false;
 
   constructor(
       canvas: HTMLCanvasElement,
@@ -69,6 +71,9 @@ export class Game {
       case SnakeType.COBRA:
         container.resolve(FoodService).isRedFoodEnabled = true;
         break;
+      case SnakeType.PYTHON:
+        this.shouldFrameAccelerate = true;
+        break;
       default:
         break;
     }
@@ -108,6 +113,7 @@ export class Game {
 
   stopGame() {
     cancelAnimationFrame(this.intervalId.value);
+    this.interval = INTERVAL;
     this.board.deathReason$.pipe(take(1)).subscribe((reason: GameOver) => {
       if (!reason) return;
       this.dialog.setDialogState(
@@ -145,9 +151,16 @@ export class Game {
           const hasEaten = this.board.tick();
           if (hasEaten) {
             container.resolve(FoodService).increaseFoodCount();
+            if (this.shouldFrameAccelerate) {
+              if (this.interval > MIN_INTERVAL) {
+                this.interval -= 30;
+                cancelAnimationFrame(this.intervalId.value);
+                this.render();
+              }
+            }
           }
         },
-        INTERVAL,
+        this.interval,
         () => {
           this.drawAll(this.intervalId.delta);
         });
