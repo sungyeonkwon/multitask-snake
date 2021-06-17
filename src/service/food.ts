@@ -1,6 +1,6 @@
 import {container, injectable, singleton} from 'tsyringe';
 import {Coords} from '../constants';
-import {getRandomCoords, isDebugMode} from '../helpers/helpers';
+import {getRandomCoords, isDebugMode} from '../helpers/utils';
 import {Dashboard} from '../ui/dashboard';
 
 @injectable()

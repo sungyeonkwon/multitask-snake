@@ -1,5 +1,5 @@
 import {Coords, Direction, INIT_SNAKE_SIZE} from '../constants';
-import {getNextCoords, isDirectionOpposite} from '../helpers/helpers';
+import {getNextCoords, isDirectionOpposite} from '../helpers/utils';
 
 export class Snake {
   sequence: Coords[] = [];

@@ -2,7 +2,7 @@ import {BehaviorSubject, ReplaySubject} from 'rxjs';
 import {container, inject} from 'tsyringe';
 
 import {Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType} from '../constants';
-import {getRandomEatSound} from '../helpers/helpers';
+import {getRandomEatSound} from '../helpers/utils';
 import {AudioService, Sound} from '../service/audio';
 import {FoodService} from '../service/food';
 import {Dashboard} from '../ui/dashboard';

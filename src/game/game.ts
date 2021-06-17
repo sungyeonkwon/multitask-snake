@@ -3,7 +3,7 @@ import {container, inject} from 'tsyringe';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, Coords, Direction, directionKeyMap, ENEMY_SNAKE_PATTERN, Feature, FIXED_FOOD_SIZE, GameOver, MIN_INTERVAL, selectedSnakeKeyMap, SnakeType, snakeTypeFeatureMap} from '../constants';
 import {INTERVAL, SNAKES} from '../constants';
-import {getFullPattern, getStartingCoords, requestInterval} from '../helpers/helpers';
+import {getFullPattern, getStartingCoords, requestInterval} from '../helpers/utils';
 import {AudioService, Sound} from '../service/audio';
 import {FoodService} from '../service/food';
 import {Dashboard} from '../ui/dashboard';

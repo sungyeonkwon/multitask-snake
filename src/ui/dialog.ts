@@ -1,6 +1,6 @@
 import {BehaviorSubject} from 'rxjs';
 import {SNAKES} from '../constants';
-import {getFullPattern} from '../helpers/helpers';
+import {getFullPattern} from '../helpers/utils';
 
 // TODO: rename to game state and use it for disabling the buttons
 export enum DialogState {
