@@ -127,10 +127,25 @@ canvas {
   display: flex;
   flex-direction: column;
 
-  p {
+  button {
     font-size: 18px;
-    color: darkgray;
+    text-align: left;
+    background: none;
+    margin: 0;
+    border: none;
+    padding: 0;
+    box-shadow: none;
   }
+}
+
+.instruction-container {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
 
   button {
     font-size: 18px;

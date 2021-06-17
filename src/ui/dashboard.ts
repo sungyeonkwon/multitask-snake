@@ -1,12 +1,12 @@
 import {BehaviorSubject, combineLatest, never, timer} from 'rxjs';
-import {map, switchMap, tap, withLatestFrom} from 'rxjs/operators';
+import {map, switchMap, tap} from 'rxjs/operators';
 import {injectable, singleton} from 'tsyringe';
 
 const RED_FOOD_TIME = 16;
 @injectable()
 @singleton()
 export class Dashboard {
-  dashboardElement: HTMLElement = document.querySelector('.dashboard')!;
+  dashboardElement = document.querySelector('.dashboard')! as HTMLElement;
   statusElement =
       this.dashboardElement.querySelector('.status') as HTMLSpanElement;
   wallCount = this.dashboardElement.querySelector('.wall') as HTMLSpanElement;

@@ -50,5 +50,6 @@ export class FoodService {
     this.food = [];
     this.eatCount = 0;
     this.redFood = [];
+    this.fixedFoodSize = 0;
   }
 }
