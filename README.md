@@ -13,9 +13,15 @@ https://multitasking-snake.xyz/
 - [ ] Add acceleration
 - [ ] Themed grid / background
 
+### Fix
+
+- [ ] Enemy agent: if it crosses itself, it should die
+- [ ] Enemy agent: Apply BFS to targeting food with taking blockers into account
+- [ ] Enemy agent: Wall and snake blockers needs to be updated on the fly
+
 ### General
 
-- [ ] BFS movement for enemy snake (Make enemy snake do u-turn / not to be stuck)
+- [x] BFS movement for enemy snake (Make enemy snake do u-turn)
 - [x] Add play instruction
 - [ ] Make patterns more granular per snake
 - [ ] Add score/screenshot dashboard -> small image with pillow

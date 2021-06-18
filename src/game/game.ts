@@ -168,8 +168,7 @@ export class Game {
 
   private activateEnemySnake() {
     const enemyStartingCoords = {x: BOARD_WIDTH / 2, y: 0};
-    this.board.enemySnake =
-        new Enemy(enemyStartingCoords, Direction.LEFT, this.board.bounds);
+    this.board.enemySnake = new Enemy(enemyStartingCoords, Direction.LEFT);
   }
 
   private drawAll(frame: number) {

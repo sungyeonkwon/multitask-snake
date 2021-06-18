@@ -23,15 +23,16 @@ export class Snake {
     this.direction = direction;
   }
 
-  grow() {
+  grow(): Coords {
     const next =
         getNextCoords(this.sequence[this.sequence.length - 1], this.direction);
     this.sequence.push(next);
+    return next;
   }
 
-  step() {
-    this.sequence.pop();
+  step(): Coords {
     this.sequence.unshift(this.newHead);
+    return this.sequence.pop();
   }
 
   makeBody(start: Coords) {

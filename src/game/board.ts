@@ -1,7 +1,8 @@
-import {BehaviorSubject, ReplaySubject} from 'rxjs';
+import {ReplaySubject} from 'rxjs';
 import {container, inject} from 'tsyringe';
 
 import {Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType} from '../constants';
+import {BreathFirstSearch} from '../helpers/search';
 import {getRandomEatSound} from '../helpers/utils';
 import {AudioService, Sound} from '../service/audio';
 import {FoodService} from '../service/food';
@@ -20,6 +21,9 @@ export class Board {
   dashboardMode: HTMLElement = document.querySelector('.mode');
   deathReason$ = new ReplaySubject<GameOver|null>(1);
   enemySnake?: Enemy|null;
+  search?: BreathFirstSearch;
+  boardState: Array<boolean[]> =
+      [];  // Whether or not (enemy) snake can pass through
 
   constructor(
       width: number,
@@ -28,6 +32,7 @@ export class Board {
       @inject('foodService') readonly foodService?: FoodService,
   ) {
     this.bounds = {x: width, y: height};
+    this.boardState = this.getBoardState();
 
     container.resolve(Dashboard).isMultiSelectionTimerOn$.subscribe(isOn => {
       container.resolve(Dashboard).updateStatus(
@@ -66,6 +71,9 @@ export class Board {
     this.enemySnake = null;
     container.resolve(Dashboard).reset();
     container.resolve(FoodService).reset();
+    if (this.search) {
+      this.search = null;
+    }
   }
 
   canProceed(): boolean {
@@ -101,7 +109,14 @@ export class Board {
     });
     if (isNotAlreadyWall && isNotPartofSnake) {
       this.wall.push(block);
+      this.updateBoardState(block, false);
     }
+  }
+
+  /** Call whenever there's an update from other snakes growing */
+  // TODO: This is not reflected until the next search is in place.
+  updateBoardState(coords: Coords, isOpen: boolean) {
+    this.boardState[coords.y][coords.x] = isOpen;
   }
 
   removeWalls(x: number, y: number) {
@@ -125,7 +140,8 @@ export class Board {
     let hasEaten = false;
     for (let i = 0; i < this.snakes.length; i++) {
       const snake = this.snakes[i];
-      snake.step();
+      const removedSegment = snake.step();
+      this.updateBoardState(removedSegment, true);
 
       const foodIndex =
           this.getEatenFoodIndex(snake, container.resolve(FoodService).food);
@@ -145,7 +161,25 @@ export class Board {
     }
 
     if (this.enemySnake) {
-      this.enemySnake.step();
+      this.enemySnake.setTargetFood();
+
+      // Start searching only when there is no ongoing search operation
+      if (!this.search || this.search.qf.isEmpty) {
+        const boardState = this.getBoardState();
+        this.search = new BreathFirstSearch(
+            boardState, this.enemySnake.head, this.enemySnake.targetFood);
+        const directionsToExhaust =
+            this.search.solve(this.enemySnake.direction);
+        this.enemySnake.setDirectionToExhaust(directionsToExhaust);
+      }
+
+      if (this.enemySnake.directionsToExhaust.length === 1) {
+        this.search.qf.reset();  // Reset for new food search
+      }
+
+      const removedSegment = this.enemySnake.step();
+      this.updateBoardState(removedSegment, true);
+
       const enemyEatenfoodIndex = this.getEatenFoodIndex(
           this.enemySnake, container.resolve(FoodService).food);
       if (enemyEatenfoodIndex >= 0) {
@@ -156,14 +190,30 @@ export class Board {
     return hasEaten;
   }
 
+  /**
+   * Exports board state with open block as true, closed block (occupied with
+   * snake bodies) as false.
+   */
+  private getBoardState(): Array<boolean[]> {
+    for (let y = 0; y < this.bounds.y; y++) {
+      this.boardState[y] = [];
+      for (let x = 0; x < this.bounds.x; x++) {
+        this.boardState[y].push(true);
+      }
+    }
+
+    this.getSnakeAndWallCoords().forEach((coords) => {
+      this.boardState[coords.y][coords.x] = false;
+    });
+    return this.boardState;
+  }
+
   private consumeFood(
       foodIndex: number, snake: Snake, isRedFood: boolean, isEnemy = false) {
-    snake.grow();
-    if (isEnemy) {
-      container.resolve(AudioService).play(Sound.ENEMY);
-    } else {
-      container.resolve(AudioService).play(getRandomEatSound());
-    }
+    const addedSegment = snake.grow();
+    this.updateBoardState(addedSegment, false);
+    container.resolve(AudioService)
+        .play(isEnemy ? Sound.ENEMY : getRandomEatSound());
     container.resolve(FoodService)
         .replenishFood(
             foodIndex, this.snakeCount, this.getSnakeAndWallCoords(),
