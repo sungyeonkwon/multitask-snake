@@ -17,8 +17,8 @@ https://multitasking-snake.xyz/
 
 ### General
 
-- [ ] BFS movement for enemy snake (Make enemy snake do u-turn / not to be stuck)
+- [x] Add play instruction
 - [ ] Make patterns more granular per snake
-- [ ] Add play instruction
+- [ ] BFS movement for enemy snake (Make enemy snake do u-turn / not to be stuck)
 - [ ] Add score/screenshot dashboard -> small image with pillow
 - [ ] Make it responsive

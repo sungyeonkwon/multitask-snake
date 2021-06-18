@@ -138,6 +138,33 @@ canvas {
   }
 }
 
+.how-to {
+  border: 2px solid $border-grey;
+  background-color: black;
+  width: 400px;
+  color: white;
+  z-index: 99;
+  position: absolute;
+  right: 0;
+  top: 30px;
+  padding: 20px;
+  display: none;
+
+  .keyboard {
+    border: 2px solid $border-grey;
+    padding: 2px 5px;
+    font-size: 18px;
+  }
+
+  p {
+    &:first-child {
+      margin-top: 0;
+    }
+
+    font-size: 18px;
+  }
+}
+
 .instruction-container {
   position: absolute;
   right: 30px;
@@ -155,5 +182,9 @@ canvas {
     border: none;
     padding: 0;
     box-shadow: none;
+
+    &:hover + .how-to {
+      display: block;
+    }
   }
 }
