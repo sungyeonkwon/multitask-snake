@@ -8,17 +8,15 @@ https://multitasking-snake.xyz/
 
 ### Feature
 
-- [x] Version: enemy snake
-- [x] Version: multi control mode with red food
-- [x] Version: x3 more food opportunities
+- [ ] Version: food with number to forward by
 - [ ] Add sound effect for drawing
 - [ ] Add acceleration
 - [ ] Themed grid / background
 
 ### General
 
+- [ ] BFS movement for enemy snake (Make enemy snake do u-turn / not to be stuck)
 - [x] Add play instruction
 - [ ] Make patterns more granular per snake
-- [ ] BFS movement for enemy snake (Make enemy snake do u-turn / not to be stuck)
 - [ ] Add score/screenshot dashboard -> small image with pillow
 - [ ] Make it responsive
