@@ -65,7 +65,7 @@ export class Game {
       case SnakeType.VIPER:
         this.activateEnemySnake();
         break;
-      case SnakeType.ANACONDA:
+      case SnakeType.RAINBOW_BOA:
         container.resolve(FoodService).fixedFoodSize = FIXED_FOOD_SIZE;
         break;
       case SnakeType.COBRA:
@@ -251,15 +251,19 @@ export class Game {
     const isSnakeSelected = snakeIndex === this.board.selectedSnake;
 
     // Fill body
-    const pattern = SNAKES.find(s => s.type === this.board.snakeType).pattern;
-    const fullPattern = isEnemySnake ?
+    const pattern = isEnemySnake ?
         ENEMY_SNAKE_PATTERN :
-        getFullPattern(pattern, snake.sequence.length);  // Enemy snake pattern
-    snake.sequence.forEach((coords, index) => {
-      this.ctx.fillStyle = fullPattern[index];
-      this.ctx.fillRect(
-          coords.x * (BLOCK_SIZE + 1) + 1, coords.y * (BLOCK_SIZE + 1) + 1,
-          BLOCK_SIZE, BLOCK_SIZE);
+        SNAKES.find(s => s.type === this.board.snakeType).pattern;
+    snake.sequence.forEach((coords) => {
+      for (let y = 0; y < pattern.length; y++) {
+        for (let x = 0; x < pattern[y].length; x++) {
+          const w = BLOCK_SIZE / pattern.length;
+          this.ctx.fillStyle = pattern[y][x];
+          this.ctx.fillRect(
+              coords.x * (BLOCK_SIZE + 1) + w * x + 1,
+              coords.y * (BLOCK_SIZE + 1) + w * y + 1, w, w);
+        }
+      }
     });
 
     // Fill head

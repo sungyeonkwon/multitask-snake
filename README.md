@@ -23,6 +23,6 @@ https://multitasking-snake.xyz/
 
 - [x] BFS movement for enemy snake (Make enemy snake do u-turn)
 - [x] Add play instruction
-- [ ] Make patterns more granular per snake
+- [x] Make patterns more granular per snake
 - [ ] Add score/screenshot dashboard -> small image with pillow
 - [ ] Make it responsive

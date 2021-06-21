@@ -23,7 +23,7 @@ export enum SnakeType {
   VIPER = 'Viper',
   MAMBA = 'Mamba',
   COBRA = 'Cobra',
-  ANACONDA = 'Anaconda',
+  RAINBOW_BOA = 'Rainbow Boa',
   PYTHON = 'Python',
   ANILIUS = 'Anilius',
 }
@@ -40,60 +40,82 @@ export interface GameConfig {
 
 interface SnakeConfig {
   type: SnakeType;
-  pattern: string[];
+  pattern: string[][];
   description: string;
 }
 
-export const ENEMY_SNAKE_PATTERN = ['red'];
+export const ENEMY_SNAKE_PATTERN = [
+  ['red', 'red', 'red', 'red', 'red'],
+  ['red', 'black', 'red', 'black', 'red'],
+  ['red', 'red', 'black', 'red', 'red'],
+  ['red', 'black', 'red', 'black', 'red'],
+  ['red', 'red', 'red', 'red', 'red'],
+];
 
 export const SNAKES: SnakeConfig[] = [
   {
     type: SnakeType.MAMBA,
     pattern: [
-      'green',
+      ['darkgreen', 'darkgreen', 'darkgreen', 'darkgreen', 'darkgreen'],
+      ['green', 'green', 'green', 'green', 'green'],
+      ['green', 'green', 'green', 'green', 'green'],
+      ['green', 'green', 'green', 'green', 'green'],
+      ['lightgreen', 'lightgreen', 'lightgreen', 'lightgreen', 'lightgreen'],
     ],
     description: 'Comes with the most basic environment.',
   },
   {
     type: SnakeType.VIPER,
     pattern: [
-      'blue',
-      'grey',
+      ['lightblue', 'lightblue', 'purple', 'lightblue', 'lightblue'],
+      ['lightblue', 'purple', 'red', 'purple', 'lightblue'],
+      ['purple', 'red', 'red', 'red', 'purple'],
+      ['lightblue', 'purple', 'red', 'purple', 'lightblue'],
+      ['lightblue', 'lightblue', 'purple', 'lightblue', 'lightblue'],
     ],
     description: 'Beware: Enemy snake is present.',
   },
   {
     type: SnakeType.COBRA,
     pattern: [
-      'red',
-      'blue',
-      'red',
+      ['black', 'grey', 'darkgray', 'grey', 'black'],
+      ['grey', 'grey', 'darkgray', 'grey', 'grey'],
+      ['grey', 'grey', 'darkgray', 'grey', 'grey'],
+      ['grey', 'grey', 'darkgray', 'grey', 'grey'],
+      ['black', 'grey', 'darkgray', 'grey', 'black'],
     ],
     description: 'Eat red food, all snakes to be under one control.',
   },
   {
-    type: SnakeType.ANACONDA,
+    type: SnakeType.RAINBOW_BOA,
     pattern: [
-      'yellow',
-      'grey',
+      ['red', 'orange', 'yellow', 'green', 'blue'],
+      ['red', 'orange', 'yellow', 'green', 'blue'],
+      ['red', 'orange', 'yellow', 'green', 'blue'],
+      ['red', 'orange', 'yellow', 'green', 'blue'],
+      ['red', 'orange', 'yellow', 'green', 'blue'],
     ],
     description: 'With abundance of food, snakes will grow faster.',
   },
   {
     type: SnakeType.PYTHON,
     pattern: [
-      'grey',
-      'darkgrey',
+      ['pink', 'orange', 'pink', 'pink', 'pink'],
+      ['yellow', 'orange', 'orange', 'orange', 'orange'],
+      ['orange', 'pink', 'pink', 'pink', 'pink'],
+      ['pink', 'orange', 'pink', 'orange', 'orange'],
+      ['pink', 'pink', 'orange', 'yellow', 'pink'],
     ],
     description: 'The more you eat, the faster your world runs.',
   },
   {
     type: SnakeType.ANILIUS,
     pattern: [
-      'pink',
-      'blue',
-      'orange',
-      'pink',
+      ['purple', 'purple', 'purple', 'purple', 'purple'],
+      ['purple', 'purple', 'purple', 'purple', 'purple'],
+      ['red', 'red', 'red', 'red', 'red'],
+      ['red', 'red', 'red', 'red', 'red'],
+      ['red', 'red', 'red', 'red', 'red'],
     ],
     description: '(Environment TBC)',
   },

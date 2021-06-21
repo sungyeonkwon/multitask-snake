@@ -198,6 +198,17 @@
       width: 20px;
       height: 20px;
       display: inline-block;
+
+      .row {
+        width: 20px;
+        height: 4px;
+        display: flex;
+      }
+
+      .unit {
+        width: 4px;
+        height: 4px;
+      }
     }
   }
 

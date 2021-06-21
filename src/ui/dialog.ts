@@ -55,18 +55,36 @@ export class Dialog {
     this.dialogState$.next(state);
   }
 
-  getSnakesTemplate() {
+  private getSnakeRow(rowPattern: string[]): string {
+    return rowPattern
+        .map(color => {
+          return `<span class="unit" style="background: ${color}"></span>`;
+        })
+        .join('');
+  }
+
+  private getSnakesTemplate(): string {
     return `
         ${
         SNAKES
             .map(snake => {
-              const p = getFullPattern(snake.pattern, 8);
               const sections =
                   [0, 1, 2, 3, 4, 5, 6, 7]
-                      .map(
-                          index => `<span class="section" style="background: ${
-                              p[index]}"></span>`)
+                      .map(() => {
+                        const row =
+                            [0, 1, 2, 3, 4]
+                                .map((index) => {
+                                  return (`<span class="row">${
+                                      this.getSnakeRow(
+                                          snake.pattern[index])}</span>`);
+                                })
+                                .join('');
+                        return (`<span class="section">
+                        ${row}
+                        </span>`);
+                      })
                       .join('');
+
               return `<button class="type" data-type="${snake.type}">
               <h5 class="name">${snake.type}</h5>
               <div class="body">
