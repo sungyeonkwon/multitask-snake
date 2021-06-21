@@ -62,7 +62,8 @@ export const SNAKES: SnakeConfig[] = [
       ['green', 'green', 'green', 'green', 'green'],
       ['lightgreen', 'lightgreen', 'lightgreen', 'lightgreen', 'lightgreen'],
     ],
-    description: 'Comes with the most basic environment.',
+    description:
+        'Comes with the most basic environment. If it\'s too easy, draw your own walls.',
   },
   {
     type: SnakeType.VIPER,
@@ -73,7 +74,8 @@ export const SNAKES: SnakeConfig[] = [
       ['lightblue', 'purple', 'red', 'purple', 'lightblue'],
       ['lightblue', 'lightblue', 'purple', 'lightblue', 'lightblue'],
     ],
-    description: 'Beware: Enemy snake is present.',
+    description:
+        'Beware: Enemy snake is present. Touch the enemy, you will die.',
   },
   {
     type: SnakeType.COBRA,
@@ -84,7 +86,8 @@ export const SNAKES: SnakeConfig[] = [
       ['grey', 'grey', 'darkgray', 'grey', 'grey'],
       ['black', 'grey', 'darkgray', 'grey', 'black'],
     ],
-    description: 'Eat red food, all snakes to be under one control.',
+    description:
+        'Eat red food, all snakes to be under one control for 15 seconds.',
   },
   {
     type: SnakeType.RAINBOW_BOA,
