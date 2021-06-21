@@ -161,6 +161,6 @@ export const snakeTypeFeatureMap = new Map<SnakeType, Feature>();
 snakeTypeFeatureMap.set(SnakeType.MAMBA, Feature.UNSPECIFIED);
 snakeTypeFeatureMap.set(SnakeType.VIPER, Feature.ENEMY_SNAKE);
 snakeTypeFeatureMap.set(SnakeType.COBRA, Feature.UNI_CONTROL);
-snakeTypeFeatureMap.set(SnakeType.ANACONDA, Feature.MORE_FOOD);
+snakeTypeFeatureMap.set(SnakeType.RAINBOW_BOA, Feature.MORE_FOOD);
 snakeTypeFeatureMap.set(SnakeType.ANILIUS, Feature.UNSPECIFIED);
 snakeTypeFeatureMap.set(SnakeType.PYTHON, Feature.UNSPECIFIED);
