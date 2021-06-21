@@ -57,7 +57,6 @@ class Index {
     this.canvas.width = (BLOCK_SIZE + 1) * BOARD_WIDTH + 1;
   }
 
-  // separate snake count and type
   updateSelectedConfig() {
     this.dialog.countButtons.forEach((button) => {
       if (this.game.board.snakeCount === Number(button.dataset.count)) {
@@ -81,7 +80,7 @@ class Index {
     this.shouldRecord = true;
     document.body.style.cursor = 'crosshair';
 
-    // only if the rendering isn't on
+    // Render only if the rendering isn't on
     if (!this.game.isGamePlaying) {
       this.game.render(true);
     }
@@ -92,7 +91,7 @@ class Index {
     this.shouldRecord = false;
     document.body.style.cursor = 'default';
 
-    // only if the rendering isn't on
+    // Cancel only if the rendering isn't on
     if (!this.game.isGamePlaying) {
       cancelAnimationFrame(this.game.intervalId.value);
     }
@@ -139,7 +138,7 @@ class Index {
           .toggleMute(event.target as HTMLButtonElement);
     });
 
-    // snake count listener
+    // Snake count listener
     this.dialog.countButtons.forEach((button) => {
       button.addEventListener('click', () => {
         container.resolve(AudioService).play(Sound.BUTTON);
@@ -149,7 +148,7 @@ class Index {
       });
     });
 
-    // snake type listener
+    // Snake type listener
     this.dialog.typeButtons.forEach((button) => {
       button.addEventListener('click', () => {
         container.resolve(AudioService).play(Sound.BUTTON);
@@ -211,7 +210,7 @@ class Index {
         this.eraserButton.classList.remove('selected');
       }
       this.addShouldRecordListeners();
-      // Add throttle
+      // TODO: Add throttle
       window.addEventListener('mousemove', this.pencilMouseMoveListener);
     });
 
@@ -225,7 +224,7 @@ class Index {
       }
       this.addShouldRecordListeners();
 
-      // Add throttle
+      // TODO: Add throttle
       window.addEventListener('mousemove', this.eraserMouseMoveListener);
     });
 

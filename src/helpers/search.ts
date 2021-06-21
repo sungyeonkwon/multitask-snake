@@ -43,7 +43,7 @@ export class QueueFrontier {
 }
 
 // TODO: Add test with Jest
-/** Search that enemy snake performs to reach */
+/** Search that enemy snake performs to reach target food */
 export class BreathFirstSearch {
   boardState: boolean[][];
   width: number;

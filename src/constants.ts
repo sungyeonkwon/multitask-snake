@@ -1,5 +1,5 @@
-export const BOARD_WIDTH = 50;
-export const BOARD_HEIGHT = 25;
+export const BOARD_WIDTH = 56;
+export const BOARD_HEIGHT = 28;
 export const BLOCK_SIZE = 20;
 export const INIT_SNAKE_SIZE = 5;
 export const INTERVAL = 400;
