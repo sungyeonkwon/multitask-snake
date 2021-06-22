@@ -17,7 +17,6 @@ https://multitasking-snake.xyz/
 
 ### Fix
 
-- [ ] Enemy agent: If food is gone, need to change target right away
 - [ ] Enemy agent: If it crosses itself, it should die
 - [ ] Enemy agent: Apply BFS to targeting food with taking blockers into account
 - [ ] Enemy agent: Wall and snake blockers needs to be updated on the fly

@@ -31,7 +31,7 @@ export class FoodService {
       this.redFood.push(getRandomCoords(excludeArray));
     }
     const foodBatch = isRedFood ? this.redFood : this.food;
-    foodBatch.splice(foodIndex, 1);
+    const test = foodBatch.splice(foodIndex, 1);
     this.addFood(excludeArray, isRedFood);
   }
 
@@ -40,7 +40,8 @@ export class FoodService {
     container.resolve(Dashboard).updateFoodCount(this.eatCount);
   }
 
-  isFoodAvailable(food: Coords): boolean {
+  isFoodAvailable(food: Coords|null): boolean {
+    if (!food) return false;
     return !!this.food.find(item => item.x === food.x && item.y === food.y);
   }
 

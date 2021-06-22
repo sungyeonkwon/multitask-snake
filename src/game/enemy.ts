@@ -4,7 +4,7 @@ import {FoodService} from '../service/food';
 import {Snake} from './snake';
 
 export class Enemy extends Snake {
-  targetFood: Coords;
+  targetFood: Coords|null;
   directionsToExhaust: Direction[] = [];
 
   constructor(

@@ -161,10 +161,11 @@ export class Board {
     }
 
     if (this.enemySnake) {
-      this.enemySnake.setTargetFood();
-
       // Start searching only when there is no ongoing search operation
-      if (!this.search || this.search.qf.isEmpty) {
+      if (!this.search || this.search.qf.isEmpty ||
+          !container.resolve(FoodService)
+               .isFoodAvailable(this.enemySnake.targetFood)) {
+        this.enemySnake.setTargetFood();
         const boardState = this.getBoardState();
         this.search = new BreathFirstSearch(
             boardState, this.enemySnake.head, this.enemySnake.targetFood);
