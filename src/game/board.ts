@@ -160,25 +160,16 @@ export class Board {
       }
     }
 
-    if (this.enemySnake) {
-      // Start searching only when there is no ongoing search operation
-      if (!this.search || this.search.qf.isEmpty ||
-          !container.resolve(FoodService)
-               .isFoodAvailable(this.enemySnake.targetFood)) {
-        this.enemySnake.setTargetFood();
-        const boardState = this.getBoardState();
-        this.search = new BreathFirstSearch(
-            boardState, this.enemySnake.head, this.enemySnake.targetFood);
-        const directionsToExhaust =
-            this.search.solve(this.enemySnake.direction);
-        this.enemySnake.setDirectionToExhaust(directionsToExhaust);
-      }
+    if (this.enemySnake && this.enemySnake.isAlive) {
+      this.enemySnake.setTargetFood();
+      const boardState = this.getBoardState();
+      this.search = new BreathFirstSearch(
+          boardState, this.enemySnake.head, this.enemySnake.targetFood);
+      const directionsToExhaust = this.search.solve(this.enemySnake.direction);
+      this.enemySnake.setDirectionToExhaust(directionsToExhaust);
+      const removedSegment = this.enemySnake.stepWithBumpingCheck(this.wall);
 
-      if (this.enemySnake.directionsToExhaust.length === 1) {
-        this.search.qf.reset();  // Reset for new food search
-      }
-
-      const removedSegment = this.enemySnake.step();
+      if (!this.enemySnake.isAlive) return;
       this.updateBoardState(removedSegment, true);
 
       const enemyEatenfoodIndex = this.getEatenFoodIndex(

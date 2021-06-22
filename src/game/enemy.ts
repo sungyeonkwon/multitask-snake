@@ -6,6 +6,7 @@ import {Snake} from './snake';
 export class Enemy extends Snake {
   targetFood: Coords|null;
   directionsToExhaust: Direction[] = [];
+  isAlive = true;
 
   constructor(
       start: Coords,
@@ -15,7 +16,18 @@ export class Enemy extends Snake {
     super(start, direction);
   }
 
-  step(): Coords {
+  stepWithBumpingCheck(walls: Coords[]): Coords {
+    const bumped = (coordsArray: Coords[]) => coordsArray.some(
+        segment =>
+            segment.x === this.newHead.x && segment.y === this.newHead.y);
+    const bumpedToSelf = bumped(this.sequence);
+    const bumpedToWalls = bumped(walls);
+
+    if (bumpedToSelf || bumpedToWalls) {
+      this.isAlive = false;
+      return;
+    }
+
     if (this.directionsToExhaust.length > 0) {
       this.direction = this.directionsToExhaust.shift();
     }

@@ -17,9 +17,9 @@ https://multitasking-snake.xyz/
 
 ### Fix
 
-- [ ] Enemy agent: If it crosses itself, it should die
+- [x] Enemy agent: Wall and snake blockers needs to be updated on the fly
+- [ ] Enemy agent: Add a dying motion / reappearing functionality with shorter body
 - [ ] Enemy agent: Apply BFS to targeting food with taking blockers into account
-- [ ] Enemy agent: Wall and snake blockers needs to be updated on the fly
 
 ### General
 
@@ -27,8 +27,8 @@ https://multitasking-snake.xyz/
 - [x] Add play instruction
 - [x] Make patterns more granular per snake
 - [x] Improve debug mode
+- [ ] Retain type/count with sessionStorage
 - [ ] Make it responsive
 - [ ] Add a spinner
-- [ ] Retain type/count with sessionStorage
 - [ ] Add sound effect for drawing
 - [ ] Add sound effect for starting game
