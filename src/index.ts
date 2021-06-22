@@ -39,10 +39,11 @@ class Index {
 
   private enableDebugMode() {
     if (!isDebugMode()) return;
-
     console.log('[DEV] enableDebugMode');
+
+    // row
     const gridRow = document.createElement('div');
-    gridRow.classList.add('debug');
+    gridRow.classList.add('debug', 'row');
 
     for (let i = 0; i < BOARD_WIDTH; i++) {
       const span = document.createElement('span');
@@ -50,6 +51,17 @@ class Index {
       gridRow.appendChild(span);
     }
     document.querySelector('.container').prepend(gridRow);
+
+    // column
+    const gridColumn = document.createElement('div');
+    gridColumn.classList.add('debug', 'column');
+
+    for (let i = 0; i < BOARD_HEIGHT; i++) {
+      const span = document.createElement('span');
+      span.innerText = String(i + 1);
+      gridColumn.appendChild(span);
+    }
+    document.querySelector('.container').prepend(gridColumn);
   }
 
   initCanvas() {

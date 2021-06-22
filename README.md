@@ -26,9 +26,9 @@ https://multitasking-snake.xyz/
 - [x] BFS movement for enemy snake (Make enemy snake do u-turn)
 - [x] Add play instruction
 - [x] Make patterns more granular per snake
+- [x] Improve debug mode
 - [ ] Make it responsive
 - [ ] Add a spinner
-- [ ] Improve debug mode
 - [ ] Retain type/count with sessionStorage
 - [ ] Add sound effect for drawing
 - [ ] Add sound effect for starting game
