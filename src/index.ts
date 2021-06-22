@@ -155,6 +155,7 @@ class Index {
       button.addEventListener('click', () => {
         container.resolve(AudioService).play(Sound.BUTTON);
         this.game.board.setSnakeCount(Number(button.dataset.count));
+        window.sessionStorage.setItem('snake-count', button.dataset.count);
 
         this.updateSelectedConfig();
       });
@@ -165,6 +166,7 @@ class Index {
       button.addEventListener('click', () => {
         container.resolve(AudioService).play(Sound.BUTTON);
         this.game.board.setSnakeType(button.dataset.type as SnakeType);
+        window.sessionStorage.setItem('snake-type', button.dataset.type);
 
         this.updateSelectedConfig();
       });

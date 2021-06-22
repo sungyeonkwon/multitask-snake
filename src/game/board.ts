@@ -12,8 +12,11 @@ import {Enemy} from './enemy';
 import {Snake} from './snake';
 
 export class Board {
-  private _snakeCount = DEFAULT_GAME_CONFIG.snakeCount;
-  private _snakeType = DEFAULT_GAME_CONFIG.snakeType;
+  private _snakeCount = Number(window.sessionStorage.getItem('snake-count')) ||
+      DEFAULT_GAME_CONFIG.snakeCount;
+  private _snakeType =
+      window.sessionStorage.getItem('snake-type') as SnakeType ||
+      DEFAULT_GAME_CONFIG.snakeType;
   snakes?: Snake[];
   bounds: Coords;
   selectedSnake = 0;

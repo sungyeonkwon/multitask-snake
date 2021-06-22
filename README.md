@@ -18,16 +18,16 @@ https://multitasking-snake.xyz/
 ### Fix
 
 - [x] Enemy agent: Wall and snake blockers needs to be updated on the fly
-- [ ] Enemy agent: Add a dying motion / reappearing functionality with shorter body
 - [ ] Enemy agent: Apply BFS to targeting food with taking blockers into account
 
 ### General
 
-- [x] BFS movement for enemy snake (Make enemy snake do u-turn)
+- [x] BFS movement for enemy agent (Make enemy agent do u-turn)
 - [x] Add play instruction
 - [x] Make patterns more granular per snake
 - [x] Improve debug mode
-- [ ] Retain type/count with sessionStorage
+- [x] Retain type/count with sessionStorage
+- [ ] Enemy agent: Add a dying motion / reappearing functionality with shorter body
 - [ ] Make it responsive
 - [ ] Add a spinner
 - [ ] Add sound effect for drawing
