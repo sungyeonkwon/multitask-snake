@@ -173,7 +173,7 @@ export class Board {
           boardState, this.enemySnake.head, this.enemySnake.targetFood);
       const directionsToExhaust = this.search.solve(this.enemySnake.direction);
       this.enemySnake.setDirectionToExhaust(directionsToExhaust);
-      const removedSegment = this.enemySnake.stepWithBumpingCheck(this.wall);
+      const removedSegment = this.enemySnake.step();
 
       if (!this.enemySnake.isAlive) return;
       this.updateBoardState(removedSegment, true);

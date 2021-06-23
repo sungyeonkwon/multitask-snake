@@ -17,8 +17,8 @@ https://multitasking-snake.xyz/
 
 ### Fix
 
-- [x] Enemy agent: Wall and snake blockers needs to be updated on the fly
 - [ ] Enemy agent: Apply BFS to targeting food with taking blockers into account
+- [ ] Growing when direction is changed just before food
 
 ### General
 

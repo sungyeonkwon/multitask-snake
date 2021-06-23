@@ -130,7 +130,7 @@ export class BreathFirstSearch {
         }
       }
     }
-    console.log('Frontier is empty. There is no possible solution.');
+    console.log('🤡 Frontier is empty. There is no possible solution.');
     return [];
   }
 }
