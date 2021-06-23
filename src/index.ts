@@ -47,7 +47,7 @@ class Index {
 
     for (let i = 0; i < BOARD_WIDTH; i++) {
       const span = document.createElement('span');
-      span.innerText = String(i + 1);
+      span.innerText = String(i);
       gridRow.appendChild(span);
     }
     document.querySelector('.container').prepend(gridRow);
@@ -58,7 +58,7 @@ class Index {
 
     for (let i = 0; i < BOARD_HEIGHT; i++) {
       const span = document.createElement('span');
-      span.innerText = String(i + 1);
+      span.innerText = String(i);
       gridColumn.appendChild(span);
     }
     document.querySelector('.container').prepend(gridColumn);
