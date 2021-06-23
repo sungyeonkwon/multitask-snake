@@ -110,14 +110,16 @@ export class Board {
     const isNotPartofSnake = !this.snakes.find(snake => {
       return snake.sequence.find(segment => segment.x === x && segment.y === y);
     });
-    if (isNotAlreadyWall && isNotPartofSnake) {
+    const isNotPartofEnemySnake = !this.enemySnake ?.sequence.find(segment => {
+      return segment.x === x && segment.y === y;
+    });
+    if (isNotAlreadyWall && isNotPartofSnake && isNotPartofEnemySnake) {
       this.wall.push(block);
       this.updateBoardState(block, false);
     }
   }
 
   /** Call whenever there's an update from other snakes growing */
-  // TODO: This is not reflected until the next search is in place.
   updateBoardState(coords: Coords, isOpen: boolean) {
     this.boardState[coords.y][coords.x] = isOpen;
   }
@@ -127,6 +129,7 @@ export class Board {
         this.wall.findIndex((block) => block.x === x && block.y === y);
     if (index >= 0) {
       this.wall.splice(index, 1);
+      this.updateBoardState({x, y}, true);
     }
   }
 
