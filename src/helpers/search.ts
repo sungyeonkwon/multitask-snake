@@ -108,9 +108,6 @@ export class BreadthFirstSearch {
       // Choose a node from the queue frontier
       let node = this.qf.dequeue();
 
-      // Mark node as explored
-      exploredCoords[node.coords.y][node.coords.x] = true;
-
       // Found the goal
       if (this.foodState[node.coords.y][node.coords.x]) {
         let trace = [];
@@ -126,6 +123,8 @@ export class BreadthFirstSearch {
         const explored = exploredCoords[coords.y][coords.x];
         if (!this.qf.containsCoords(coords) && !explored &&
             this.boardState[coords.y][coords.x]) {
+          // Mark node as explored
+          exploredCoords[node.coords.y][node.coords.x] = true;
           this.qf.enqueue(new Node(coords, direction, node));
         }
       }

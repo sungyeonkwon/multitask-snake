@@ -121,7 +121,10 @@ export class Board {
 
   /** Call whenever there's an update from other snakes growing */
   updateBoardState(coords: Coords, isOpen: boolean) {
-    this.boardState[coords.y][coords.x] = isOpen;
+    if (coords.x > 0 && coords.y > 0 && coords.x <= this.bounds.x &&
+        coords.y <= this.bounds.y) {
+      this.boardState[coords.y][coords.x] = isOpen;
+    }
   }
 
   removeWalls(x: number, y: number) {
