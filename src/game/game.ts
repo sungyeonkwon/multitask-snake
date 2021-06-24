@@ -83,11 +83,10 @@ export class Game {
   startGame() {
     this.board.resetBoard();
     this.activateFeature();
-
     // Populate snakes
     const snakes: Snake[] = [];
 
-    const startingFoodScalar = isDebugMode() ? 5 : 2;
+    const startingFoodScalar = isDebugMode() ? 3 : 2;
 
     if (container.resolve(FoodService).fixedFoodSize) {
       for (let i = 0; i < this.board.snakeCount; i++) {
@@ -102,11 +101,10 @@ export class Game {
       for (let i = 0; i < this.board.snakeCount; i++) {
         const coords = getStartingCoords(this.board.snakeCount, i);
         snakes.push(new Snake(coords, Direction.RIGHT));
-
-        for (let i = 0; i < this.board.snakeCount * startingFoodScalar; i++) {
-          container.resolve(FoodService)
-              .addFood(this.board.getSnakeAndWallCoords(), false);
-        }
+      }
+      for (let i = 0; i < this.board.snakeCount * startingFoodScalar; i++) {
+        container.resolve(FoodService)
+            .addFood(this.board.getSnakeAndWallCoords(), false);
       }
     }
 
