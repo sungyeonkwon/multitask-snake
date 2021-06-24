@@ -132,7 +132,7 @@ export enum Color {
   SNAKE_HEAD_SELECTED = 'red',
   SNAKE_HEAD_TEXT = 'black',
   SNAKE_HEAD_TEXT_SELECTED = 'white',
-  WALL = 'red',
+  WALL = 'white',
 }
 
 export enum Direction {

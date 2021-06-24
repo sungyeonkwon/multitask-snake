@@ -216,32 +216,32 @@ export class Game {
     this.board.wall.forEach((item) => {
       this.ctx.lineWidth = 7;
       // '+' shape
-      // this.ctx.moveTo(
-      //     item.x * (BLOCK_SIZE + 1) + 1,
-      //     item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2);
-      // this.ctx.lineTo(
-      //     item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE,
-      //     item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2);
-      // this.ctx.moveTo(
-      //     item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2,
-      //     item.y * (BLOCK_SIZE + 1) + 1);
-      // this.ctx.lineTo(
-      //     item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2,
-      //     item.y * (BLOCK_SIZE + 1) + BLOCK_SIZE + 1);
+      this.ctx.moveTo(
+          item.x * (BLOCK_SIZE + 1) + 1,
+          item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2);
+      this.ctx.lineTo(
+          item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE,
+          item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2);
+      this.ctx.moveTo(
+          item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2,
+          item.y * (BLOCK_SIZE + 1) + 1);
+      this.ctx.lineTo(
+          item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE / 2,
+          item.y * (BLOCK_SIZE + 1) + BLOCK_SIZE + 1);
 
 
       // 'x' shape
-      this.ctx.moveTo(
-          item.x * (BLOCK_SIZE + 1) + 1, item.y * (BLOCK_SIZE + 1) + 1);
-      this.ctx.lineTo(
-          item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE,
-          item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE);
-      this.ctx.moveTo(
-          item.x * (BLOCK_SIZE + 1) + 1,
-          item.y * (BLOCK_SIZE + 1) + BLOCK_SIZE + 1);
-      this.ctx.lineTo(
-          item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE,
-          item.y * (BLOCK_SIZE + 1) + 1);
+      // this.ctx.moveTo(
+      //     item.x * (BLOCK_SIZE + 1) + 1, item.y * (BLOCK_SIZE + 1) + 1);
+      // this.ctx.lineTo(
+      //     item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE,
+      //     item.y * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE);
+      // this.ctx.moveTo(
+      //     item.x * (BLOCK_SIZE + 1) + 1,
+      //     item.y * (BLOCK_SIZE + 1) + BLOCK_SIZE + 1);
+      // this.ctx.lineTo(
+      //     item.x * (BLOCK_SIZE + 1) + 1 + BLOCK_SIZE,
+      //     item.y * (BLOCK_SIZE + 1) + 1);
     });
     this.ctx.stroke();
     this.ctx.lineWidth = 1;
