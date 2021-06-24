@@ -3,7 +3,7 @@ import {container, inject} from 'tsyringe';
 
 import {BLOCK_SIZE, BOARD_HEIGHT, BOARD_WIDTH, Color, Coords, Direction, directionKeyMap, ENEMY_SNAKE_PATTERN, Feature, FIXED_FOOD_SIZE, GameOver, MIN_INTERVAL, selectedSnakeKeyMap, SnakeType, snakeTypeFeatureMap} from '../constants';
 import {INTERVAL, SNAKES} from '../constants';
-import {getFullPattern, getStartingCoords, requestInterval} from '../helpers/utils';
+import {getFullPattern, getStartingCoords, isDebugMode, requestInterval} from '../helpers/utils';
 import {AudioService, Sound} from '../service/audio';
 import {FoodService} from '../service/food';
 import {Dashboard} from '../ui/dashboard';
@@ -87,6 +87,8 @@ export class Game {
     // Populate snakes
     const snakes: Snake[] = [];
 
+    const startingFoodScalar = isDebugMode() ? 3 : 1;
+
     if (container.resolve(FoodService).fixedFoodSize) {
       for (let i = 0; i < this.board.snakeCount; i++) {
         const coords = getStartingCoords(this.board.snakeCount, i);
@@ -101,8 +103,10 @@ export class Game {
         const coords = getStartingCoords(this.board.snakeCount, i);
         snakes.push(new Snake(coords, Direction.RIGHT));
 
-        container.resolve(FoodService)
-            .addFood(this.board.getSnakeAndWallCoords(), false);
+        for (let i = 0; i < this.board.snakeCount * startingFoodScalar; i++) {
+          container.resolve(FoodService)
+              .addFood(this.board.getSnakeAndWallCoords(), false);
+        }
       }
     }
 
