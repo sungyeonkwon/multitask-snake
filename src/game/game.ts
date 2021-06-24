@@ -87,7 +87,7 @@ export class Game {
     // Populate snakes
     const snakes: Snake[] = [];
 
-    const startingFoodScalar = isDebugMode() ? 3 : 1;
+    const startingFoodScalar = isDebugMode() ? 5 : 2;
 
     if (container.resolve(FoodService).fixedFoodSize) {
       for (let i = 0; i < this.board.snakeCount; i++) {
