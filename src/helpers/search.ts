@@ -2,13 +2,13 @@ import {Coords, Direction} from '../constants';
 
 export class Node {
   coords: Coords;
-  parent?: Node;
   action: Direction;
+  parent?: Node;
 
-  constructor(coords: Coords, parent: Node|null, action: Direction) {
+  constructor(coords: Coords, action: Direction, parent?: Node) {
     this.coords = coords;
-    this.parent = parent;
     this.action = action;
+    this.parent = parent;
   }
 }
 
@@ -88,7 +88,7 @@ export class BreathFirstSearch {
 
   /** Finds the shortest path to the goal with queue frontier. */
   solve(currentDirection?: Direction): Direction[] {
-    const root = new Node(this.start, null, currentDirection);
+    const root = new Node(this.start, currentDirection);
     this.qf = new QueueFrontier();
     this.qf.enqueue(root);
 
@@ -126,7 +126,7 @@ export class BreathFirstSearch {
         const explored = exploredCoords[neighbourCoords.y][neighbourCoords.x];
         if (!this.qf.containsCoords(neighbourCoords) && !explored &&
             this.boardState[neighbourCoords.y][neighbourCoords.x]) {
-          this.qf.enqueue(new Node(neighbourCoords, node, direction));
+          this.qf.enqueue(new Node(neighbourCoords, direction, node));
         }
       }
     }
