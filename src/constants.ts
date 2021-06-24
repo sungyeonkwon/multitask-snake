@@ -46,9 +46,9 @@ interface SnakeConfig {
 
 export const ENEMY_SNAKE_PATTERN = [
   ['red', 'red', 'red', 'red', 'red'],
-  ['red', 'black', 'red', 'black', 'red'],
-  ['red', 'red', 'black', 'red', 'red'],
-  ['red', 'black', 'red', 'black', 'red'],
+  ['red', 'red', 'red', 'red', 'red'],
+  ['red', 'red', 'red', 'red', 'red'],
+  ['red', 'red', 'red', 'red', 'red'],
   ['red', 'red', 'red', 'red', 'red'],
 ];
 
@@ -68,11 +68,11 @@ export const SNAKES: SnakeConfig[] = [
   {
     type: SnakeType.VIPER,
     pattern: [
-      ['lightblue', 'lightblue', 'purple', 'lightblue', 'lightblue'],
-      ['lightblue', 'purple', 'red', 'purple', 'lightblue'],
-      ['purple', 'red', 'red', 'red', 'purple'],
-      ['lightblue', 'purple', 'red', 'purple', 'lightblue'],
-      ['lightblue', 'lightblue', 'purple', 'lightblue', 'lightblue'],
+      ['lightblue', 'lightblue', 'green', 'lightblue', 'lightblue'],
+      ['lightblue', 'green', 'blue', 'green', 'lightblue'],
+      ['green', 'blue', 'blue', 'blue', 'green'],
+      ['lightblue', 'green', 'blue', 'green', 'lightblue'],
+      ['lightblue', 'lightblue', 'green', 'lightblue', 'lightblue'],
     ],
     description:
         'Beware: Enemy snake is present. Touch the enemy, you will die.',
