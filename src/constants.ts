@@ -19,6 +19,12 @@ export enum GameOver {
   HIT_ENEMY,
 }
 
+export enum CoordsType {
+  OPEN = 'open',
+  CLOSED = 'closed',
+  FOOD = 'food',
+}
+
 export enum SnakeType {
   VIPER = 'Viper',
   MAMBA = 'Mamba',
