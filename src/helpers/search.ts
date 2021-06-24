@@ -19,11 +19,11 @@ export class QueueFrontier {
     return this.frontier.length === 0;
   }
 
-  add(node: Node) {
+  enqueue(node: Node) {
     this.frontier.push(node);
   }
 
-  remove() {
+  dequeue() {
     if (this.isEmpty) {
       console.log('Empty frontier');
       return;
@@ -42,7 +42,7 @@ export class QueueFrontier {
   }
 }
 
-// TODO: Add test with Jest
+// TODO: Add test
 /** Search that enemy snake performs to reach target food */
 export class BreathFirstSearch {
   boardState: boolean[][];
@@ -90,7 +90,7 @@ export class BreathFirstSearch {
   solve(currentDirection?: Direction): Direction[] {
     const root = new Node(this.start, null, currentDirection);
     this.qf = new QueueFrontier();
-    this.qf.add(root);
+    this.qf.enqueue(root);
 
     const exploredCoords: Array<boolean[]> = [];
     for (let y = 0; y < this.height; y++) {
@@ -102,7 +102,7 @@ export class BreathFirstSearch {
 
     while (!this.qf.isEmpty) {
       // Choose a node from the queue frontier
-      const node = this.qf.remove();
+      const node = this.qf.dequeue();
 
       // Mark node as explored
       exploredCoords[node.coords.y][node.coords.x] = true;
@@ -126,7 +126,7 @@ export class BreathFirstSearch {
         const explored = exploredCoords[neighbourCoords.y][neighbourCoords.x];
         if (!this.qf.containsCoords(neighbourCoords) && !explored &&
             this.boardState[neighbourCoords.y][neighbourCoords.x]) {
-          this.qf.add(new Node(neighbourCoords, node, direction));
+          this.qf.enqueue(new Node(neighbourCoords, node, direction));
         }
       }
     }
