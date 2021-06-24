@@ -1,18 +1,22 @@
 import {Coords, Direction} from '../constants';
 
-export class Node {
+class Node {
   coords: Coords;
   action: Direction;
   parent?: Node;
 
-  constructor(coords: Coords, action: Direction, parent?: Node) {
+  constructor(
+      coords: Coords,
+      action: Direction,
+      parent?: Node,
+  ) {
     this.coords = coords;
     this.action = action;
     this.parent = parent;
   }
 }
 
-export class QueueFrontier {
+class QueueFrontier {
   frontier: Node[] = [];
 
   get isEmpty(): boolean {
