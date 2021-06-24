@@ -1,10 +1,9 @@
-import {container, inject} from 'tsyringe';
+import {inject} from 'tsyringe';
 import {Coords, Direction} from '../constants';
 import {FoodService} from '../service/food';
 import {Snake} from './snake';
 
 export class Enemy extends Snake {
-  targetFood: Coords|null;
   directionsToExhaust: Direction[] = [];
   isAlive = true;
 
@@ -29,21 +28,5 @@ export class Enemy extends Snake {
 
   setDirectionToExhaust(directionsToExhaust: Direction[]) {
     this.directionsToExhaust = directionsToExhaust;
-  }
-
-  setTargetFood() {
-    // Enemy is smart, she targets the closest food.
-    // TODO: This doesn't take into account the blockers.
-    this.targetFood = container.resolve(FoodService)
-                          .food
-                          .map(food => {
-                            return {
-                              value: food,
-                              distance: Math.abs(food.x - this.head.x) +
-                                  Math.abs(food.y - this.head.y)
-                            };
-                          })
-                          .sort((a, b) => a.distance - b.distance)
-                          .map(item => item.value)[0];
   }
 }

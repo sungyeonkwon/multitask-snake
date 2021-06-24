@@ -44,22 +44,22 @@ export class QueueFrontier {
 
 // TODO: Add test
 /** Search that enemy snake performs to reach target food */
-export class BreathFirstSearch {
+export class BreadthFirstSearch {
   boardState: boolean[][];
+  foodState: boolean[][];
   width: number;
   height: number;
   start: Coords;
-  goal: Coords;
   qf?: QueueFrontier;
 
   constructor(
       boardState: boolean[][],
+      foodState: boolean[][],
       snakeHead: Coords,
-      goal: Coords,
   ) {
     this.boardState = boardState;
+    this.foodState = foodState;
     this.start = snakeHead;
-    this.goal = goal;
     this.height = boardState.length;
     this.width = boardState[0].length;
   }
@@ -92,7 +92,7 @@ export class BreathFirstSearch {
     this.qf = new QueueFrontier();
     this.qf.enqueue(root);
 
-    const exploredCoords: Array<boolean[]> = [];
+    const exploredCoords: boolean[][] = [];
     for (let y = 0; y < this.height; y++) {
       exploredCoords[y] = [];
       for (let x = 0; x < this.width; x++) {
@@ -102,31 +102,27 @@ export class BreathFirstSearch {
 
     while (!this.qf.isEmpty) {
       // Choose a node from the queue frontier
-      const node = this.qf.dequeue();
+      let node = this.qf.dequeue();
 
       // Mark node as explored
       exploredCoords[node.coords.y][node.coords.x] = true;
 
       // Found the goal
-      if (node.coords.x === this.goal.x && node.coords.y === this.goal.y) {
-        // Trace back the path
-        let track = [];
-        let nodeToTrack = node;
-        while (!!nodeToTrack.parent) {
-          track.unshift(nodeToTrack);
-          nodeToTrack = nodeToTrack.parent;
+      if (this.foodState[node.coords.y][node.coords.x]) {
+        let trace = [];
+        while (!!node.parent) {
+          trace.push(node);
+          node = node.parent;
         }
-        const actions = track.map(node => node.action);
-        return actions;
+        return trace.reverse().map(node => node.action);
       }
 
       // Add neighbors to the queue frontier
-      for (const [direction, neighbourCoords] of this.getNeighbours(
-               node.coords)) {
-        const explored = exploredCoords[neighbourCoords.y][neighbourCoords.x];
-        if (!this.qf.containsCoords(neighbourCoords) && !explored &&
-            this.boardState[neighbourCoords.y][neighbourCoords.x]) {
-          this.qf.enqueue(new Node(neighbourCoords, direction, node));
+      for (const [direction, coords] of this.getNeighbours(node.coords)) {
+        const explored = exploredCoords[coords.y][coords.x];
+        if (!this.qf.containsCoords(coords) && !explored &&
+            this.boardState[coords.y][coords.x]) {
+          this.qf.enqueue(new Node(coords, direction, node));
         }
       }
     }

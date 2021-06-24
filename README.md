@@ -17,7 +17,6 @@ https://multitasking-snake.xyz/
 
 ### Fix
 
-- [ ] Enemy agent: Apply BFS to targeting food with taking blockers into account
 - [ ] Growing when direction is changed just before food
 
 ### General

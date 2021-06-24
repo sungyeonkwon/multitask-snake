@@ -2,7 +2,7 @@ import {ReplaySubject} from 'rxjs';
 import {container, inject} from 'tsyringe';
 
 import {Coords, DEFAULT_GAME_CONFIG, GameOver, SnakeType} from '../constants';
-import {BreathFirstSearch} from '../helpers/search';
+import {BreadthFirstSearch} from '../helpers/search';
 import {getRandomEatSound} from '../helpers/utils';
 import {AudioService, Sound} from '../service/audio';
 import {FoodService} from '../service/food';
@@ -24,7 +24,7 @@ export class Board {
   dashboardMode: HTMLElement = document.querySelector('.mode');
   deathReason$ = new ReplaySubject<GameOver|null>(1);
   enemySnake?: Enemy|null;
-  search?: BreathFirstSearch;
+  search?: BreadthFirstSearch;
   boardState: Array<boolean[]> =
       [];  // Whether or not (enemy) snake can pass through
 
@@ -167,10 +167,10 @@ export class Board {
     }
 
     if (this.enemySnake && this.enemySnake.isAlive) {
-      this.enemySnake.setTargetFood();
       const boardState = this.getBoardState();
-      this.search = new BreathFirstSearch(
-          boardState, this.enemySnake.head, this.enemySnake.targetFood);
+      const foodState = this.getFoodState();
+      this.search =
+          new BreadthFirstSearch(boardState, foodState, this.enemySnake.head);
       const directionsToExhaust = this.search.solve(this.enemySnake.direction);
       this.enemySnake.setDirectionToExhaust(directionsToExhaust);
       const removedSegment = this.enemySnake.step();
@@ -204,6 +204,21 @@ export class Board {
       this.boardState[coords.y][coords.x] = false;
     });
     return this.boardState;
+  }
+
+  private getFoodState(): Array<boolean[]> {
+    let foodState: boolean[][] = [];
+    for (let y = 0; y < this.bounds.y; y++) {
+      foodState[y] = [];
+      for (let x = 0; x < this.bounds.x; x++) {
+        foodState[y].push(false);
+      }
+    }
+
+    container.resolve(FoodService).food.forEach((coords) => {
+      foodState[coords.y][coords.x] = true;
+    });
+    return foodState;
   }
 
   private consumeFood(
