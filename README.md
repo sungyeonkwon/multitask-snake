@@ -2,7 +2,7 @@
 
 Snake game, but a lot of them because multitasking is hard. Featuring some home-made nom nom nom sounds. This needs more work / clean up.
 
-https://multitasking-snake.xyz/
+https://multitasking-snake.netlify.app/
 
 ## TODO
 
